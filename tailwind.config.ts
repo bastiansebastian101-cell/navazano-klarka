@@ -28,7 +28,7 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ["var(--font-fredoka)", "system-ui", "sans-serif"],
+        display: ["var(--font-playfair)", "Georgia", "serif"],
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
       boxShadow: {
