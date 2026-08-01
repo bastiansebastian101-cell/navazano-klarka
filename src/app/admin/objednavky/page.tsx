@@ -57,7 +57,7 @@ export default function AdminOrdersPage() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="font-medium text-ink">
-                    #{order.id.slice(-8)} — {order.customerName}
+                    #{order.orderNumber} — {order.customerName}
                   </p>
                   <p className="text-sm text-ink-light">
                     {order.phone} · {order.email}

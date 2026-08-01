@@ -17,6 +17,7 @@ const FROM = 'Navázáno by Klára <onboarding@resend.dev>';
 
 interface OrderEmailData {
   orderId: string;
+  orderNumber: number;
   customerName: string;
   customerEmail: string;
   deliveryAddress: string;
@@ -44,14 +45,25 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
   const dateLabel = data.deliveryDate.toLocaleDateString('cs-CZ');
   const paymentLabel = data.paymentMethod === 'bank_transfer' ? 'Bankovní převod' : 'Platba při doručení';
 
+  const bankDetails =
+    data.paymentMethod === 'bank_transfer' && process.env.BANK_IBAN
+      ? `
+        <div style="margin-top:12px;padding:16px;background:#fff;border:1px solid #eee;border-radius:8px;">
+          <p style="margin:0 0 6px;color:#111;font-size:14px;"><strong>Číslo účtu (IBAN):</strong> ${process.env.BANK_IBAN}</p>
+          <p style="margin:0 0 6px;color:#111;font-size:14px;"><strong>Variabilní symbol:</strong> ${data.orderNumber}</p>
+          <p style="margin:0;color:#111;font-size:14px;"><strong>Částka:</strong> ${formatCzk(data.totalCzk)}</p>
+        </div>
+      `
+      : '';
+
   const { error } = await resend.emails.send({
     from: FROM,
     to: data.customerEmail,
-    subject: `Potvrzení objednávky #${data.orderId.slice(-8)} — Navázáno by Klára`,
+    subject: `Potvrzení objednávky #${data.orderNumber} — Navázáno by Klára`,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;">
         <h2 style="color:#111;margin-bottom:4px;">Děkujeme za objednávku!</h2>
-        <p style="color:#777;font-size:13px;margin-bottom:24px;">Objednávka #${data.orderId.slice(-8)}</p>
+        <p style="color:#777;font-size:13px;margin-bottom:24px;">Objednávka #${data.orderNumber}</p>
         <table style="width:100%;border-collapse:collapse;font-size:14px;">${itemsTable(data.items)}</table>
         <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:16px;border-top:1px solid #eee;padding-top:8px;">
           <tr><td style="padding:8px 0;font-weight:600;color:#111;">Celkem</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#B8567A;">${formatCzk(data.totalCzk)}</td></tr>
@@ -60,6 +72,7 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
           <p style="margin:0 0 6px;color:#111;font-size:14px;"><strong>Doručení:</strong> ${dateLabel}, ${windowLabel}</p>
           <p style="margin:0 0 6px;color:#111;font-size:14px;"><strong>Adresa:</strong> ${data.deliveryAddress}</p>
           <p style="margin:0;color:#111;font-size:14px;"><strong>Platba:</strong> ${paymentLabel}</p>
+          ${bankDetails}
         </div>
         <p style="color:#999;font-size:12px;margin-top:32px;">Navázáno by Klára</p>
       </div>
@@ -98,7 +111,7 @@ export async function sendNewOrderAlertEmail(data: OrderEmailData): Promise<bool
         </table>
       </div>
     `;
-  const subject = `Nová objednávka #${data.orderId.slice(-8)} od ${data.customerName}`;
+  const subject = `Nová objednávka #${data.orderNumber} od ${data.customerName}`;
 
   // Sent individually per recipient — Resend rejects the whole call if any
   // one address isn't allowed (e.g. sandbox mode only allows the account

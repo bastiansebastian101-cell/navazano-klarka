@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
 
     const emailData = {
       orderId: order.id,
+      orderNumber: order.orderNumber,
       customerName: order.customerName,
       customerEmail: order.email,
       deliveryAddress: order.deliveryAddress,

@@ -25,6 +25,7 @@ model Product {
 
 model Order {
   id              String   @id @default(cuid())
+  orderNumber     Int      @unique @default(autoincrement()) // numeric, used as the bank payment Variable Symbol
   customerName    String
   phone           String
   email           String

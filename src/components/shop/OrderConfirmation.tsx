@@ -10,10 +10,12 @@ type OrderWithItems = Prisma.OrderGetPayload<{ include: { items: { include: { pr
 
 export function OrderConfirmation({
   order,
-  bankAccountNumber,
+  iban,
+  qrDataUrl,
 }: {
   order: OrderWithItems;
-  bankAccountNumber: string | null;
+  iban: string | null;
+  qrDataUrl: string | null;
 }) {
   const { language, t } = useLanguage();
 
@@ -25,7 +27,7 @@ export function OrderConfirmation({
       <div className="text-5xl mb-4">💐</div>
       <h1 className="font-display text-3xl text-ink">{t.confirmation.title}</h1>
       <p className="mt-2 text-ink-light">
-        {t.confirmation.orderNumber}: <span className="font-mono">#{order.id.slice(-8)}</span>
+        {t.confirmation.orderNumber}: <span className="font-mono">#{order.orderNumber}</span>
       </p>
 
       <div className="mt-8 bg-white rounded-2xl shadow-card p-6 text-left">
@@ -50,10 +52,31 @@ export function OrderConfirmation({
 
       {order.paymentMethod === 'bank_transfer' ? (
         <div className="mt-6 bg-brand-light rounded-2xl p-6 text-left">
-          <p className="text-sm text-ink">{t.confirmation.bankTransferInfo}</p>
-          <p className="mt-2 font-mono text-lg text-brand font-semibold">
-            {bankAccountNumber ?? '—'}
-          </p>
+          <p className="text-sm text-ink mb-4">{t.confirmation.bankTransferInfo}</p>
+          <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+            <dl className="flex-1 w-full space-y-2 text-sm">
+              <div className="flex justify-between sm:block">
+                <dt className="text-ink-light">{t.confirmation.accountNumber}</dt>
+                <dd className="font-mono font-semibold text-ink">{iban ?? '—'}</dd>
+              </div>
+              <div className="flex justify-between sm:block">
+                <dt className="text-ink-light">{t.confirmation.variableSymbol}</dt>
+                <dd className="font-mono font-semibold text-ink">{order.orderNumber}</dd>
+              </div>
+              <div className="flex justify-between sm:block">
+                <dt className="text-ink-light">{t.confirmation.amount}</dt>
+                <dd className="font-mono font-semibold text-brand">{formatCzk(order.totalCzk)}</dd>
+              </div>
+            </dl>
+            {qrDataUrl && (
+              <div className="flex-shrink-0 text-center">
+                <p className="text-xs text-ink-light mb-1 uppercase tracking-wide">{t.confirmation.qrPayment}</p>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={qrDataUrl} alt="QR platba" width={160} height={160} className="rounded-lg border border-ink-lighter/20 bg-white p-2" />
+              </div>
+            )}
+          </div>
+          <p className="mt-4 text-xs text-ink-light bg-white/60 rounded-lg p-3">{t.confirmation.exactAmountWarning}</p>
         </div>
       ) : (
         <div className="mt-6 bg-brand-light rounded-2xl p-6 text-left">
