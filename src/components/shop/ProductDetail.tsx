@@ -41,7 +41,7 @@ export function ProductDetail({ product }: { product: Product }) {
                 imageUrl: product.imageUrl,
               })
             }
-            className="mt-8 bg-brand hover:bg-brand-hover text-white font-semibold px-8 py-3 rounded-full transition-colors"
+            className="mt-8 w-full sm:w-auto bg-brand hover:bg-brand-hover text-white font-semibold px-8 py-3 rounded-full transition-colors"
           >
             {t.catalog.addToCart}
           </button>
