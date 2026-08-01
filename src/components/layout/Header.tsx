@@ -26,8 +26,8 @@ export function Header() {
     <header className="sticky top-0 z-50 bg-cream/95 backdrop-blur border-b border-ink-lighter/20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-6">
         <Link href="/" className="flex-shrink-0">
-          <span className="font-display text-2xl tracking-tight text-brand">Navázáno</span>
-          <span className="font-display text-2xl tracking-tight text-ink"> by Klárka</span>
+          <span className="font-display text-2xl tracking-tight text-brand">Navazano</span>
+          <span className="font-display text-2xl tracking-tight text-ink"> by Klara</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">

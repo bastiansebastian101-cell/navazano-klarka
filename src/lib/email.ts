@@ -13,7 +13,7 @@ function getResend(): Resend | null {
 // TODO: switch to a domain-verified sender (e.g. objednavky@navazano-klarka.cz)
 // once a real domain is set up on Resend for this project — resend.dev works
 // without verification but is only meant for testing.
-const FROM = 'Navázáno by Klárka <onboarding@resend.dev>';
+const FROM = 'Navazano by Klara <onboarding@resend.dev>';
 
 interface OrderEmailData {
   orderId: string;
@@ -47,7 +47,7 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
   const { error } = await resend.emails.send({
     from: FROM,
     to: data.customerEmail,
-    subject: `Potvrzení objednávky #${data.orderId.slice(-8)} — Navázáno by Klárka`,
+    subject: `Potvrzení objednávky #${data.orderId.slice(-8)} — Navazano by Klara`,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;">
         <h2 style="color:#111;margin-bottom:4px;">Děkujeme za objednávku!</h2>
@@ -61,7 +61,7 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
           <p style="margin:0 0 6px;color:#111;font-size:14px;"><strong>Adresa:</strong> ${data.deliveryAddress}</p>
           <p style="margin:0;color:#111;font-size:14px;"><strong>Platba:</strong> ${paymentLabel}</p>
         </div>
-        <p style="color:#999;font-size:12px;margin-top:32px;">Navázáno by Klárka</p>
+        <p style="color:#999;font-size:12px;margin-top:32px;">Navazano by Klara</p>
       </div>
     `,
   });
