@@ -75,8 +75,8 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
 
 export async function sendNewOrderAlertEmail(data: OrderEmailData): Promise<boolean> {
   const resend = getResend();
-  const notifyEmail = process.env.KLARKA_NOTIFY_EMAIL;
-  if (!resend || !notifyEmail) return false;
+  const notifyEmails = process.env.KLARKA_NOTIFY_EMAIL?.split(',').map((e) => e.trim()).filter(Boolean);
+  if (!resend || !notifyEmails?.length) return false;
 
   const windowLabel = DELIVERY_WINDOW_LABELS_CS[data.deliveryWindow] ?? data.deliveryWindow;
   const dateLabel = data.deliveryDate.toLocaleDateString('cs-CZ');
@@ -84,7 +84,7 @@ export async function sendNewOrderAlertEmail(data: OrderEmailData): Promise<bool
 
   const { error } = await resend.emails.send({
     from: FROM,
-    to: notifyEmail,
+    to: notifyEmails,
     subject: `Nová objednávka #${data.orderId.slice(-8)} od ${data.customerName}`,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;">
@@ -105,7 +105,7 @@ export async function sendNewOrderAlertEmail(data: OrderEmailData): Promise<bool
   });
 
   if (error) {
-    console.error('sendNewOrderAlertEmail failed:', notifyEmail, error);
+    console.error('sendNewOrderAlertEmail failed:', notifyEmails, error);
     return false;
   }
   return true;
