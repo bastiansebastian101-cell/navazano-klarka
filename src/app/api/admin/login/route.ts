@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { COOKIE_NAME, getExpectedToken } from '@/lib/auth';
-import { checkRateLimit, getIp } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
-  const ip = getIp(request);
-  if (!checkRateLimit(`login:${ip}`, 5, 15 * 60 * 1000)) {
-    return NextResponse.json({ error: 'Too many login attempts. Try again in 15 minutes.' }, { status: 429 });
-  }
-
   const body = await request.json().catch(() => ({}));
   const { password } = body;
 
