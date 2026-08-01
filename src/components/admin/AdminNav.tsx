@@ -19,7 +19,7 @@ export function AdminNav() {
   return (
     <header className="bg-white border-b border-ink-lighter/20">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <span className="font-display text-lg text-brand">Navazano — Admin</span>
+        <span className="font-display text-lg text-brand">Navázáno — Admin</span>
         <nav className="flex items-center gap-6">
           <Link
             href="/admin/objednavky"

@@ -17,7 +17,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'Navazano by Klara — Ručně vázané kytice',
+  title: 'Navázáno by Klára — Ručně vázané kytice',
   description: 'Ručně vázané kytice a květinové dárky s doručením až k vám domů.',
 };
 

@@ -1,5 +1,5 @@
 export const cs = {
-  brand: 'Navazano by Klara',
+  brand: 'Navázáno by Klára',
   nav: {
     catalog: 'Katalog',
     cart: 'Košík',

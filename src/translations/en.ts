@@ -1,7 +1,7 @@
 import type { Translations } from './cs';
 
 export const en: Translations = {
-  brand: 'Navazano by Klara',
+  brand: 'Navázáno by Klára',
   nav: {
     catalog: 'Catalog',
     cart: 'Cart',
