@@ -74,6 +74,7 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
           <p style="margin:0;color:#111;font-size:14px;"><strong>Platba:</strong> ${paymentLabel}</p>
           ${bankDetails}
         </div>
+        <p style="margin-top:20px;color:#555;font-size:13px;">Uložili jsme vaše údaje, abyste mohli sledovat historii objednávek. Přihlaste se pomocí e-mailu <strong>${data.customerEmail}</strong> na <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://navazano.cz'}/ucet" style="color:#B8567A;">navazano.cz/ucet</a>.</p>
         <p style="color:#999;font-size:12px;margin-top:32px;">Navázáno by Klára</p>
       </div>
     `,
@@ -130,4 +131,29 @@ export async function sendNewOrderAlertEmail(data: OrderEmailData): Promise<bool
     }
   });
   return anySucceeded;
+}
+
+export async function sendLoginLinkEmail(email: string, loginUrl: string): Promise<boolean> {
+  const resend = getResend();
+  if (!resend) return false;
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: email,
+    subject: 'Přihlašovací odkaz — Navázáno by Klára',
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;">
+        <h2 style="color:#111;margin-bottom:12px;">Přihlášení k vašemu účtu</h2>
+        <p style="color:#111;font-size:14px;line-height:1.6;">Klikněte na tlačítko níže pro přihlášení a zobrazení historie vašich objednávek. Odkaz je platný 15 minut.</p>
+        <a href="${loginUrl}" style="display:inline-block;margin-top:20px;background:#F582B3;color:#fff;text-decoration:none;font-weight:600;padding:12px 28px;border-radius:999px;">Přihlásit se</a>
+        <p style="color:#999;font-size:12px;margin-top:32px;">Pokud jste o přihlášení nežádali, tento e-mail můžete ignorovat.</p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error('sendLoginLinkEmail failed:', email, error);
+    return false;
+  }
+  return true;
 }

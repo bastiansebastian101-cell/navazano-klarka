@@ -84,9 +84,29 @@ export function OrderConfirmation({
         </div>
       )}
 
+      <p className="mt-8 text-sm text-ink-light">
+        {language === 'cs' ? (
+          <>
+            Uložili jsme vaše údaje, abyste mohli sledovat historii objednávek. Přihlaste se na{' '}
+            <Link href="/ucet" className="text-brand hover:text-brand-hover font-medium">
+              navazano.cz/ucet
+            </Link>{' '}
+            pomocí e-mailu {order.email}.
+          </>
+        ) : (
+          <>
+            We&apos;ve saved your details so you can track your order history. Log in at{' '}
+            <Link href="/ucet" className="text-brand hover:text-brand-hover font-medium">
+              navazano.cz/ucet
+            </Link>{' '}
+            using {order.email}.
+          </>
+        )}
+      </p>
+
       <Link
         href="/"
-        className="mt-10 inline-flex items-center bg-brand hover:bg-brand-hover text-white font-semibold px-8 py-3 rounded-full transition-colors"
+        className="mt-6 inline-flex items-center bg-brand hover:bg-brand-hover text-white font-semibold px-8 py-3 rounded-full transition-colors"
       >
         {t.confirmation.backHome}
       </Link>

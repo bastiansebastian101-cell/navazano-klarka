@@ -61,17 +61,31 @@ export async function POST(request: NextRequest) {
 
     const totalCzk = orderItems.reduce((sum, i) => sum + i.priceCzk * i.quantity, 0);
 
+    const customerName = body.customerName.trim();
+    const phone = body.phone.trim();
+    const email = body.email.trim();
+
+    // Auto-create/update a Customer record so returning shoppers (matched by
+    // email) can look up their order history later via the magic-link login —
+    // this doesn't add any new required checkout field or change the flow.
+    const customer = await prisma.customer.upsert({
+      where: { email },
+      create: { email, name: customerName, phone },
+      update: { name: customerName, phone },
+    });
+
     const order = await prisma.order.create({
       data: {
-        customerName: body.customerName.trim(),
-        phone: body.phone.trim(),
-        email: body.email.trim(),
+        customerName,
+        phone,
+        email,
         deliveryAddress: body.deliveryAddress.trim(),
         deliveryDate,
         deliveryWindow: body.deliveryWindow,
         paymentMethod: body.paymentMethod,
         notes: body.notes?.trim() || null,
         totalCzk,
+        customerId: customer.id,
         items: { create: orderItems },
       },
       include: { items: { include: { product: true } } },

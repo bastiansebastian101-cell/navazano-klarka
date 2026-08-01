@@ -24,8 +24,8 @@ model Product {
 }
 
 model Order {
-  id              String   @id @default(cuid())
-  orderNumber     Int      @unique @default(autoincrement()) // numeric, used as the bank payment Variable Symbol
+  id              String    @id @default(cuid())
+  orderNumber     Int       @unique @default(autoincrement()) // numeric, used as the bank payment Variable Symbol
   customerName    String
   phone           String
   email           String
@@ -33,12 +33,33 @@ model Order {
   deliveryDate    DateTime
   deliveryWindow  String // "9-12" | "12-15" | "15-18"
   paymentMethod   String // "bank_transfer" | "cash_on_delivery"
-  status          String   @default("new") // new | confirmed | out_for_delivery | delivered | cancelled
+  status          String    @default("new") // new | confirmed | out_for_delivery | delivered | cancelled
   notes           String?
   totalCzk        Int
-  createdAt       DateTime @default(now())
+  createdAt       DateTime  @default(now())
+  customerId      String?
+  customer        Customer? @relation(fields: [customerId], references: [id])
 
   items OrderItem[]
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  phone     String
+  createdAt DateTime @default(now())
+
+  orders Order[]
+}
+
+model LoginToken {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  email     String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
 }
 
 model OrderItem {

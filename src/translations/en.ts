@@ -6,6 +6,7 @@ export const en: Translations = {
     catalog: 'Catalog',
     cart: 'Cart',
     home: 'Home',
+    account: 'My account',
   },
   home: {
     heroTitle: 'Handmade bouquets, tied with love',
@@ -108,5 +109,18 @@ export const en: Translations = {
   },
   footer: {
     rights: 'All rights reserved.',
+  },
+  account: {
+    loginTitle: 'Log in',
+    loginIntro: "Enter the email you used when ordering and we'll send you a login link.",
+    email: 'Email',
+    sendLink: 'Send link',
+    sending: 'Sending...',
+    checkEmail: "If that email is registered, we've sent a login link to it. Check your inbox.",
+    linkExpired: 'This link is no longer valid. Please request a new one.',
+    linkInvalid: 'This link is invalid.',
+    orderHistoryTitle: 'Order history',
+    noOrders: "You haven't placed any orders with us yet.",
+    logout: 'Log out',
   },
 };

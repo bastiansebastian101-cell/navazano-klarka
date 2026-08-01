@@ -4,6 +4,7 @@ export const cs = {
     catalog: 'Katalog',
     cart: 'Košík',
     home: 'Domů',
+    account: 'Můj účet',
   },
   home: {
     heroTitle: 'Ručně vázané kytice s láskou',
@@ -106,6 +107,19 @@ export const cs = {
   },
   footer: {
     rights: 'Všechna práva vyhrazena.',
+  },
+  account: {
+    loginTitle: 'Přihlášení',
+    loginIntro: 'Zadejte e-mail, který jste použili při objednávce, a pošleme vám přihlašovací odkaz.',
+    email: 'E-mail',
+    sendLink: 'Odeslat odkaz',
+    sending: 'Odesílám...',
+    checkEmail: 'Pokud je e-mail zaregistrován, odeslali jsme na něj přihlašovací odkaz. Zkontrolujte svou schránku.',
+    linkExpired: 'Odkaz už není platný. Zkuste si prosím vyžádat nový.',
+    linkInvalid: 'Odkaz je neplatný.',
+    orderHistoryTitle: 'Historie objednávek',
+    noOrders: 'Zatím jste u nás nic neobjednali.',
+    logout: 'Odhlásit se',
   },
 };
 

@@ -37,6 +37,9 @@ export function Header() {
 
         <div className="flex items-center gap-3">
           <LanguageSwitcher />
+          <Link href="/ucet" className="hidden sm:inline text-sm font-medium text-ink hover:text-brand transition-colors">
+            {t.nav.account}
+          </Link>
           <Link
             href="/kosik"
             className="relative inline-flex items-center gap-2 bg-brand hover:bg-brand-hover text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors"
