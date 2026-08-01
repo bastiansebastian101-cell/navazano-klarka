@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Product {
+  id            String   @id @default(cuid())
+  nameCs        String
+  nameEn        String
+  descriptionCs String
+  descriptionEn String
+  priceCzk      Int // haléře, e.g. 89900 = 899 Kč
+  category      String // "bouquet" | "plant" | "gift"
+  imageUrl      String?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  orderItems OrderItem[]
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  customerName    String
+  phone           String
+  email           String
+  deliveryAddress String
+  deliveryDate    DateTime
+  deliveryWindow  String // "9-12" | "12-15" | "15-18"
+  paymentMethod   String // "bank_transfer" | "cash_on_delivery"
+  status          String   @default("new") // new | confirmed | out_for_delivery | delivered | cancelled
+  notes           String?
+  totalCzk        Int
+  createdAt       DateTime @default(now())
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  priceCzk  Int // price at time of order
+}
