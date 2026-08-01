@@ -33,6 +33,7 @@ export function Header() {
         <nav className="hidden md:flex items-center gap-6">
           {navLink('/', t.nav.home)}
           {navLink('/katalog', t.nav.catalog)}
+          {navLink('/o-nas', t.nav.about)}
         </nav>
 
         <div className="flex items-center gap-3">

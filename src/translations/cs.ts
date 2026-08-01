@@ -5,6 +5,7 @@ export const cs = {
     cart: 'Košík',
     home: 'Domů',
     account: 'Můj účet',
+    about: 'O nás',
   },
   home: {
     heroTitle: 'Ručně vázané kytice s láskou',
@@ -118,6 +119,16 @@ export const cs = {
     orderHistoryTitle: 'Historie objednávek',
     noOrders: 'Zatím jste u nás nic neobjednali.',
     logout: 'Odhlásit se',
+  },
+  about: {
+    title: 'O nás',
+    paragraphs: [
+      'Ahoj, já jsem Klára a NAVÁZÁNO je můj splněný sen, do kterého dávám celé své srdce. 🌸✨',
+      'Pro mě květiny nikdy nebyly jen obyčejným dárkem. 🌿 Jsou to tiché vzkazy, objetí vyjádřené barvami, radost v běžný den i vzpomínky, které s námi zůstávají. Vždycky jsem toužila tvořit věci, které mají duši, a tak jsem se rozhodla skočit do neznáma a začít vázat autorské kytice pro České Budějovice a okolí. 💐',
+      'Na téhle cestě ale nestojím sama. Mým největším zázemím a obrovskou oporou je můj přítel. 👩‍❤️‍👨 Je to člověk, který ve mně věří více než já sama, když mě přepadnou pochybnosti. Stojí při mně v zákulisí a pomáhá mi se vším těžkým okolo. 🤍',
+      'Jsme na samém začátku a každá jedna vaše objednávka pro nás znamená neuvěřitelně moc. ✨ Děkujeme, že nám svěřujete svoje příběhy a že můžeme tvořit kytice pro vaše nejhezčí okamžiky.',
+    ],
+    signatureLines: ['S láskou,', 'Klára & Sebin 🩷', 'NAVÁZÁNO | České Budějovice'],
   },
 };
 

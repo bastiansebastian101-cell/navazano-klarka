@@ -7,6 +7,7 @@ export const en: Translations = {
     cart: 'Cart',
     home: 'Home',
     account: 'My account',
+    about: 'About us',
   },
   home: {
     heroTitle: 'Handmade bouquets, tied with love',
@@ -120,5 +121,15 @@ export const en: Translations = {
     orderHistoryTitle: 'Order history',
     noOrders: "You haven't placed any orders with us yet.",
     logout: 'Log out',
+  },
+  about: {
+    title: 'About us',
+    paragraphs: [
+      "Hi, I'm Klára, and NAVÁZÁNO is my dream come true — I pour my whole heart into it. 🌸✨",
+      "To me, flowers were never just an ordinary gift. 🌿 They're quiet messages, a hug expressed in color, joy on an ordinary day, and memories that stay with us. I've always longed to create things with soul, so I decided to take a leap into the unknown and start tying signature bouquets for České Budějovice and the surrounding area. 💐",
+      "But I'm not on this journey alone. My biggest support and rock is my boyfriend. 👩‍❤️‍👨 He's someone who believes in me more than I believe in myself when doubts creep in. He stands by me behind the scenes and helps me with everything that's hard. 🤍",
+      "We're right at the beginning, and every single order means an incredible amount to us. ✨ Thank you for trusting us with your stories and letting us create bouquets for your most beautiful moments.",
+    ],
+    signatureLines: ['With love,', 'Klára & Sebin 🩷', 'NAVÁZÁNO | České Budějovice'],
   },
 };
