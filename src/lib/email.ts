@@ -10,10 +10,7 @@ function getResend(): Resend | null {
   return _resend;
 }
 
-// TODO: switch to a domain-verified sender (e.g. objednavky@navazano-klarka.cz)
-// once a real domain is set up on Resend for this project — resend.dev works
-// without verification but is only meant for testing.
-const FROM = 'Navázáno by Klára <onboarding@resend.dev>';
+const FROM = 'Navázáno by Klára <objednavky@navazano.cz>';
 
 interface OrderEmailData {
   orderId: string;
