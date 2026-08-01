@@ -78,6 +78,9 @@ export async function sendNewOrderAlertEmail(data: OrderEmailData): Promise<bool
   const notifyEmails = process.env.KLARKA_NOTIFY_EMAIL?.split(',').map((e) => e.trim()).filter(Boolean);
   if (!resend || !notifyEmails?.length) return false;
 
+  // TEMP DIAGNOSTIC — remove after confirming the malformed-value cause
+  console.log('DIAGNOSTIC notifyEmails:', JSON.stringify(notifyEmails), notifyEmails.map((e) => [...e].map((c) => c.charCodeAt(0))));
+
   const windowLabel = DELIVERY_WINDOW_LABELS_CS[data.deliveryWindow] ?? data.deliveryWindow;
   const dateLabel = data.deliveryDate.toLocaleDateString('cs-CZ');
   const paymentLabel = data.paymentMethod === 'bank_transfer' ? 'Bankovní převod' : 'Platba při doručení';
