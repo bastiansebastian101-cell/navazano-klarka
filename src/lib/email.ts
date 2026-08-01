@@ -79,7 +79,7 @@ export async function sendNewOrderAlertEmail(data: OrderEmailData): Promise<bool
   if (!resend || !notifyEmails?.length) return false;
 
   // TEMP DIAGNOSTIC — remove after confirming the malformed-value cause
-  console.log('DIAGNOSTIC notifyEmails:', JSON.stringify(notifyEmails), notifyEmails.map((e) => [...e].map((c) => c.charCodeAt(0))));
+  console.log('DIAGNOSTIC notifyEmails:', JSON.stringify(notifyEmails), notifyEmails.map((e) => Array.from(e).map((c) => c.charCodeAt(0))));
 
   const windowLabel = DELIVERY_WINDOW_LABELS_CS[data.deliveryWindow] ?? data.deliveryWindow;
   const dateLabel = data.deliveryDate.toLocaleDateString('cs-CZ');
