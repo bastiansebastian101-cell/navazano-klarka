@@ -10,24 +10,25 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          DEFAULT: "#B8567A",
-          hover: "#9E4568",
-          light: "#FBEEF1",
-          dark: "#7A3450",
+          DEFAULT: "#F582B3",
+          hover: "#EF66A0",
+          light: "#FFE9F3",
+          dark: "#C94F87",
         },
         sage: {
-          DEFAULT: "#8A9A7E",
-          light: "#EEF2EA",
+          DEFAULT: "#6FC79A",
+          light: "#E3F8EC",
+          dark: "#4FA87C",
         },
-        cream: "#FDFBF7",
+        cream: "#FFF8FB",
         ink: {
-          DEFAULT: "#3A3532",
-          light: "#6B655F",
-          lighter: "#A29B93",
+          DEFAULT: "#4A3B45",
+          light: "#8A7482",
+          lighter: "#C9AFC0",
         },
       },
       fontFamily: {
-        display: ["var(--font-playfair)", "Georgia", "serif"],
+        display: ["var(--font-fredoka)", "system-ui", "sans-serif"],
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
       boxShadow: {

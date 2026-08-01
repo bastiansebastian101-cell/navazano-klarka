@@ -14,7 +14,7 @@ export function ProductCard({ product }: { product: Product }) {
   const name = language === 'cs' ? product.nameCs : product.nameEn;
 
   return (
-    <div className="group rounded-2xl bg-white shadow-card hover:shadow-card-hover transition-shadow overflow-hidden">
+    <div className="group rounded-3xl bg-white shadow-card hover:shadow-card-hover transition-shadow overflow-hidden">
       <Link href={`/produkt/${product.id}`} className="block aspect-square bg-sage-light relative overflow-hidden">
         {product.imageUrl ? (
           <Image
@@ -26,6 +26,9 @@ export function ProductCard({ product }: { product: Product }) {
         ) : (
           <div className="w-full h-full flex items-center justify-center text-5xl">🌸</div>
         )}
+        <span className="absolute top-3 left-3 bg-sage text-white text-xs font-semibold px-3 py-1 rounded-full shadow-card">
+          {t.catalog.categories[product.category as keyof typeof t.catalog.categories] ?? product.category}
+        </span>
       </Link>
       <div className="p-5">
         <Link href={`/produkt/${product.id}`}>

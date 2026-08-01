@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display } from 'next/font/google';
+import { Inter, Fredoka } from 'next/font/google';
 import './globals.css';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CartProvider } from '@/contexts/CartContext';
@@ -10,9 +10,9 @@ const inter = Inter({
   display: 'swap',
 });
 
-const playfair = Playfair_Display({
+const fredoka = Fredoka({
   subsets: ['latin', 'latin-ext'],
-  variable: '--font-playfair',
+  variable: '--font-fredoka',
   display: 'swap',
 });
 
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="cs" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="cs" className={`${inter.variable} ${fredoka.variable}`}>
       <body className="font-sans bg-cream text-ink">
         <LanguageProvider>
           <CartProvider>{children}</CartProvider>
