@@ -78,18 +78,11 @@ export async function sendNewOrderAlertEmail(data: OrderEmailData): Promise<bool
   const notifyEmails = process.env.KLARKA_NOTIFY_EMAIL?.split(',').map((e) => e.trim()).filter(Boolean);
   if (!resend || !notifyEmails?.length) return false;
 
-  // TEMP DIAGNOSTIC — remove after confirming the malformed-value cause
-  console.log('DIAGNOSTIC notifyEmails:', JSON.stringify(notifyEmails), notifyEmails.map((e) => Array.from(e).map((c) => c.charCodeAt(0))));
-
   const windowLabel = DELIVERY_WINDOW_LABELS_CS[data.deliveryWindow] ?? data.deliveryWindow;
   const dateLabel = data.deliveryDate.toLocaleDateString('cs-CZ');
   const paymentLabel = data.paymentMethod === 'bank_transfer' ? 'Bankovní převod' : 'Platba při doručení';
 
-  const { error } = await resend.emails.send({
-    from: FROM,
-    to: notifyEmails,
-    subject: `Nová objednávka #${data.orderId.slice(-8)} od ${data.customerName}`,
-    html: `
+  const html = `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;">
         <h2 style="color:#111;margin-bottom:4px;">Nová objednávka</h2>
         <table style="width:100%;border-collapse:collapse;font-size:14px;">
@@ -104,12 +97,24 @@ export async function sendNewOrderAlertEmail(data: OrderEmailData): Promise<bool
           <tr><td style="padding:8px 0;font-weight:600;color:#111;">Celkem</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#B8567A;">${formatCzk(data.totalCzk)}</td></tr>
         </table>
       </div>
-    `,
-  });
+    `;
+  const subject = `Nová objednávka #${data.orderId.slice(-8)} od ${data.customerName}`;
 
-  if (error) {
-    console.error('sendNewOrderAlertEmail failed:', notifyEmails, error);
-    return false;
-  }
-  return true;
+  // Sent individually per recipient — Resend rejects the whole call if any
+  // one address isn't allowed (e.g. sandbox mode only allows the account
+  // owner's own address), which would otherwise block delivery to every
+  // recipient just because one of them isn't cleared yet.
+  const results = await Promise.all(
+    notifyEmails.map((to) => resend.emails.send({ from: FROM, to, subject, html }))
+  );
+
+  let anySucceeded = false;
+  results.forEach(({ error }, i) => {
+    if (error) {
+      console.error('sendNewOrderAlertEmail failed:', notifyEmails[i], error);
+    } else {
+      anySucceeded = true;
+    }
+  });
+  return anySucceeded;
 }
