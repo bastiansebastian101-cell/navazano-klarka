@@ -10,7 +10,6 @@ interface OrderRequestBody {
   deliveryAddress: string;
   deliveryDate: string; // ISO date
   deliveryWindow: string;
-  paymentMethod: string;
   notes?: string;
   items: { productId: string; quantity: number }[];
 }
@@ -29,10 +28,6 @@ export async function POST(request: NextRequest) {
       body.items.length === 0
     ) {
       return NextResponse.json({ error: 'missing_fields' }, { status: 400 });
-    }
-
-    if (!['bank_transfer', 'cash_on_delivery'].includes(body.paymentMethod)) {
-      return NextResponse.json({ error: 'invalid_payment_method' }, { status: 400 });
     }
 
     if (!isDeliveryWindowValid(body.deliveryWindow)) {
@@ -82,7 +77,7 @@ export async function POST(request: NextRequest) {
         deliveryAddress: body.deliveryAddress.trim(),
         deliveryDate,
         deliveryWindow: body.deliveryWindow,
-        paymentMethod: body.paymentMethod,
+        paymentMethod: 'bank_transfer', // only payment method offered — never trust client input here
         notes: body.notes?.trim() || null,
         totalCzk,
         customerId: customer.id,

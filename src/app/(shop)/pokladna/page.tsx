@@ -25,7 +25,6 @@ export default function CheckoutPage() {
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [deliveryDate, setDeliveryDate] = useState(minDate);
   const [deliveryWindow, setDeliveryWindow] = useState<DeliveryWindow>(DELIVERY_WINDOWS[0]);
-  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'cash_on_delivery'>('bank_transfer');
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +56,7 @@ export default function CheckoutPage() {
           deliveryAddress,
           deliveryDate: new Date(deliveryDate).toISOString(),
           deliveryWindow,
-          paymentMethod,
+          paymentMethod: 'bank_transfer',
           notes,
           items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
         }),
@@ -152,26 +151,7 @@ export default function CheckoutPage() {
 
         <div>
           <h2 className="font-medium text-ink mb-3">{t.checkout.paymentMethod}</h2>
-          <div className="space-y-2">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="paymentMethod"
-                checked={paymentMethod === 'bank_transfer'}
-                onChange={() => setPaymentMethod('bank_transfer')}
-              />
-              {t.checkout.bankTransfer}
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="paymentMethod"
-                checked={paymentMethod === 'cash_on_delivery'}
-                onChange={() => setPaymentMethod('cash_on_delivery')}
-              />
-              {t.checkout.cashOnDelivery}
-            </label>
-          </div>
+          <p className="text-sm text-ink-light bg-brand-light rounded-lg px-4 py-2.5">{t.checkout.bankTransfer}</p>
         </div>
 
         <div>
