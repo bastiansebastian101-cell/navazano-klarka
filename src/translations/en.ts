@@ -165,6 +165,7 @@ export const en: Translations = {
     photoLabel: 'Inspiration photo (optional)',
     addPhoto: 'Add photo',
     uploading: 'Uploading...',
+    priceNote: "The price depends on the materials used. We'll let you know the price after reviewing your request.",
     submit: 'Send request',
     submitting: 'Sending...',
     successTitle: 'Thank you!',

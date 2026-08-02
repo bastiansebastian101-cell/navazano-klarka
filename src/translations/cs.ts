@@ -163,6 +163,7 @@ export const cs = {
     photoLabel: 'Fotka inspirace (nepovinné)',
     addPhoto: 'Přidat fotku',
     uploading: 'Nahrávám...',
+    priceNote: 'Cena se odvíjí od použitých materiálů. O ceně vás budeme informovat po zhodnocení vašeho přání.',
     submit: 'Odeslat přání',
     submitting: 'Odesílám...',
     successTitle: 'Děkujeme!',

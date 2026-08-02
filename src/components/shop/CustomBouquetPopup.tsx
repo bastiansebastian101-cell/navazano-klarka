@@ -189,10 +189,12 @@ export function CustomBouquetPopup() {
 
                 {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 
+                <p className="mt-4 text-xs text-ink-lighter">{t.customRequest.priceNote}</p>
+
                 <button
                   type="submit"
                   disabled={submitting || uploading}
-                  className="mt-6 w-full bg-brand hover:bg-brand-hover disabled:opacity-60 text-white text-sm font-semibold py-3 rounded-full transition-colors"
+                  className="mt-3 w-full bg-brand hover:bg-brand-hover disabled:opacity-60 text-white text-sm font-semibold py-3 rounded-full transition-colors"
                 >
                   {submitting ? t.customRequest.submitting : t.customRequest.submit}
                 </button>
