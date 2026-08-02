@@ -29,6 +29,8 @@ export const en: Translations = {
   product: {
     priceLabel: 'Price',
     back: 'Back to catalog',
+    share: 'Share',
+    linkCopied: 'Link copied!',
   },
   cart: {
     title: 'Cart',

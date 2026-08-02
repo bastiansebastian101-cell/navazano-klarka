@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { formatCzk } from '@/lib/format';
 import { ImageGallery } from '@/components/shop/ImageGallery';
+import { ShareButton } from '@/components/shop/ShareButton';
 
 export function ProductDetail({ product }: { product: Product }) {
   const { language, t } = useLanguage();
@@ -24,7 +25,10 @@ export function ProductDetail({ product }: { product: Product }) {
           <ImageGallery images={product.imageUrls} alt={name} size="detail" />
         </div>
         <div>
-          <h1 className="font-display text-3xl text-ink">{name}</h1>
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="font-display text-3xl text-ink">{name}</h1>
+            <ShareButton productId={product.id} variant="labeled" className="mt-1 shrink-0 inline-flex items-center gap-2 text-sm font-semibold text-ink-light hover:text-brand transition-colors" />
+          </div>
           <p className="mt-2 text-2xl text-brand font-semibold">{formatCzk(product.priceCzk)}</p>
           <p className="mt-6 text-ink-light leading-relaxed">{description}</p>
           <button

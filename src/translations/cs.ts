@@ -27,6 +27,8 @@ export const cs = {
   product: {
     priceLabel: 'Cena',
     back: 'Zpět do katalogu',
+    share: 'Sdílet',
+    linkCopied: 'Odkaz zkopírován!',
   },
   cart: {
     title: 'Košík',

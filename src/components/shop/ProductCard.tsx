@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { formatCzk } from '@/lib/format';
 import { ImageGallery } from '@/components/shop/ImageGallery';
+import { ShareButton } from '@/components/shop/ShareButton';
 
 export function ProductCard({ product }: { product: Product }) {
   const { language, t } = useLanguage();
@@ -15,12 +16,18 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <div className="group rounded-3xl bg-white shadow-card hover:shadow-card-hover transition-shadow overflow-hidden">
-      <Link href={`/produkt/${product.id}`} className="block aspect-square bg-sage-light relative overflow-hidden">
-        <ImageGallery images={product.imageUrls} alt={name} size="card" />
+      <div className="aspect-square bg-sage-light relative overflow-hidden">
+        <Link href={`/produkt/${product.id}`} className="absolute inset-0 block">
+          <ImageGallery images={product.imageUrls} alt={name} size="card" />
+        </Link>
         <span className="absolute top-3 left-3 bg-sage text-white text-xs font-semibold px-3 py-1 rounded-full shadow-card pointer-events-none">
           {t.catalog.categories[product.category as keyof typeof t.catalog.categories] ?? product.category}
         </span>
-      </Link>
+        <ShareButton
+          productId={product.id}
+          className="absolute top-3 right-3 bg-white/90 hover:bg-white text-ink-light hover:text-brand rounded-full p-2 shadow-card transition-colors"
+        />
+      </div>
       <div className="p-5">
         <Link href={`/produkt/${product.id}`}>
           <h3 className="font-display text-lg text-ink hover:text-brand transition-colors">{name}</h3>
