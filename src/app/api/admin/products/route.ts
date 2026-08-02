@@ -16,6 +16,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'invalid_input' }, { status: 400 });
   }
 
+  const imageUrls =
+    Array.isArray(body.imageUrls) && body.imageUrls.every((u: unknown) => typeof u === 'string')
+      ? body.imageUrls.slice(0, 3)
+      : [];
+
   const product = await prisma.product.create({
     data: {
       nameCs: body.nameCs.trim(),
@@ -24,7 +29,7 @@ export async function POST(request: NextRequest) {
       descriptionEn: body.descriptionEn?.trim() ?? '',
       priceCzk: body.priceCzk,
       category: body.category ?? 'bouquet',
-      imageUrl: body.imageUrl ?? null,
+      imageUrls,
       active: body.active ?? true,
     },
   });

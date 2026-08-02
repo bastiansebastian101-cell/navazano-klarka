@@ -16,7 +16,7 @@ model Product {
   descriptionEn String
   priceCzk      Int // haléře, e.g. 89900 = 899 Kč
   category      String // "bouquet" | "plant" | "gift"
-  imageUrl      String?
+  imageUrls     String[] @default([]) // up to 3 photos
   active        Boolean  @default(true)
   createdAt     DateTime @default(now())
 

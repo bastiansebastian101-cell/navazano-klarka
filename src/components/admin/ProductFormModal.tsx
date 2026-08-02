@@ -5,6 +5,7 @@ import type { Product } from '@prisma/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const CATEGORIES = ['bouquet', 'plant', 'gift'] as const;
+const MAX_IMAGES = 3;
 
 export function ProductFormModal({
   product,
@@ -22,19 +23,28 @@ export function ProductFormModal({
   const [descriptionEn, setDescriptionEn] = useState(product?.descriptionEn ?? '');
   const [priceCzk, setPriceCzk] = useState(product ? Math.round(product.priceCzk / 100) : 0);
   const [category, setCategory] = useState(product?.category ?? 'bouquet');
-  const [imageUrl, setImageUrl] = useState<string | null>(product?.imageUrl ?? null);
+  const [imageSlots, setImageSlots] = useState<(string | null)[]>(() => {
+    const existing = product?.imageUrls ?? [];
+    return Array.from({ length: MAX_IMAGES }, (_, i) => existing[i] ?? null);
+  });
+  const [uploadingSlot, setUploadingSlot] = useState<number | null>(null);
   const [active, setActive] = useState(product?.active ?? true);
-  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const handleUpload = async (file: File) => {
-    setUploading(true);
+  const handleUpload = async (slotIndex: number, file: File) => {
+    setUploadingSlot(slotIndex);
     const form = new FormData();
     form.append('file', file);
     const res = await fetch('/api/admin/upload', { method: 'POST', body: form });
     const data = await res.json();
-    if (data.url) setImageUrl(data.url);
-    setUploading(false);
+    if (data.url) {
+      setImageSlots((prev) => prev.map((url, i) => (i === slotIndex ? data.url : url)));
+    }
+    setUploadingSlot(null);
+  };
+
+  const handleRemoveSlot = (slotIndex: number) => {
+    setImageSlots((prev) => prev.map((url, i) => (i === slotIndex ? null : url)));
   };
 
   const handleSave = async () => {
@@ -46,7 +56,7 @@ export function ProductFormModal({
       descriptionEn,
       priceCzk: Math.round(priceCzk * 100),
       category,
-      imageUrl,
+      imageUrls: imageSlots.filter((url): url is string => url !== null),
       active,
     };
 
@@ -67,6 +77,8 @@ export function ProductFormModal({
     setSaving(false);
     onSaved();
   };
+
+  const anyUploading = uploadingSlot !== null;
 
   return (
     <div className="fixed inset-0 bg-ink/40 flex items-center justify-center p-4 z-50" onClick={onClose}>
@@ -131,20 +143,45 @@ export function ProductFormModal({
           </div>
 
           <div>
-            <label className="block text-sm text-ink-light mb-1">{t.admin.image}</label>
-            {imageUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={imageUrl} alt="" className="w-24 h-24 object-cover rounded-lg mb-2" />
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleUpload(file);
-              }}
-            />
-            {uploading && <p className="text-sm text-ink-light mt-1">{t.admin.uploading}</p>}
+            <label className="block text-sm text-ink-light mb-2">
+              {t.admin.image} ({t.admin.upTo3Photos})
+            </label>
+            <div className="grid grid-cols-3 gap-3">
+              {imageSlots.map((url, i) => (
+                <div key={i} className="aspect-square rounded-lg border border-ink-lighter/30 relative overflow-hidden bg-sage-light">
+                  {url ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={url} alt="" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSlot(i)}
+                        className="absolute top-1 right-1 w-5 h-5 rounded-full bg-ink/70 text-white text-xs flex items-center justify-center"
+                      >
+                        ×
+                      </button>
+                    </>
+                  ) : uploadingSlot === i ? (
+                    <div className="w-full h-full flex items-center justify-center text-xs text-ink-light text-center px-1">
+                      {t.admin.uploading}
+                    </div>
+                  ) : (
+                    <label className="w-full h-full flex items-center justify-center text-2xl text-ink-lighter cursor-pointer">
+                      +
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleUpload(i, file);
+                        }}
+                      />
+                    </label>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
 
           <label className="flex items-center gap-2 text-sm text-ink">
@@ -156,7 +193,7 @@ export function ProductFormModal({
         <div className="flex gap-3 mt-6">
           <button
             onClick={handleSave}
-            disabled={saving || uploading}
+            disabled={saving || anyUploading}
             className="flex-1 bg-brand hover:bg-brand-hover disabled:opacity-60 text-white font-semibold py-2.5 rounded-full transition-colors"
           >
             {t.admin.save}

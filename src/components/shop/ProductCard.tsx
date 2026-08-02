@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import type { Product } from '@prisma/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { formatCzk } from '@/lib/format';
+import { ImageGallery } from '@/components/shop/ImageGallery';
 
 export function ProductCard({ product }: { product: Product }) {
   const { language, t } = useLanguage();
@@ -16,17 +16,8 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <div className="group rounded-3xl bg-white shadow-card hover:shadow-card-hover transition-shadow overflow-hidden">
       <Link href={`/produkt/${product.id}`} className="block aspect-square bg-sage-light relative overflow-hidden">
-        {product.imageUrl ? (
-          <Image
-            src={product.imageUrl}
-            alt={name}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-5xl">🌸</div>
-        )}
-        <span className="absolute top-3 left-3 bg-sage text-white text-xs font-semibold px-3 py-1 rounded-full shadow-card">
+        <ImageGallery images={product.imageUrls} alt={name} size="card" />
+        <span className="absolute top-3 left-3 bg-sage text-white text-xs font-semibold px-3 py-1 rounded-full shadow-card pointer-events-none">
           {t.catalog.categories[product.category as keyof typeof t.catalog.categories] ?? product.category}
         </span>
       </Link>
@@ -42,7 +33,7 @@ export function ProductCard({ product }: { product: Product }) {
               nameCs: product.nameCs,
               nameEn: product.nameEn,
               priceCzk: product.priceCzk,
-              imageUrl: product.imageUrl,
+              imageUrl: product.imageUrls[0] ?? null,
             })
           }
           className="mt-4 w-full bg-brand hover:bg-brand-hover text-white text-sm font-semibold py-2.5 rounded-full transition-colors"

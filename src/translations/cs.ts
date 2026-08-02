@@ -97,6 +97,7 @@ export const cs = {
     category: 'Kategorie',
     image: 'Fotka',
     uploadImage: 'Nahrát fotku',
+    upTo3Photos: 'max. 3 fotky',
     uploading: 'Nahrávám...',
     active: 'Aktivní (viditelné v katalogu)',
     save: 'Uložit',

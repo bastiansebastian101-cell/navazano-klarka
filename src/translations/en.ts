@@ -99,6 +99,7 @@ export const en: Translations = {
     category: 'Category',
     image: 'Photo',
     uploadImage: 'Upload photo',
+    upTo3Photos: 'up to 3 photos',
     uploading: 'Uploading...',
     active: 'Active (visible in catalog)',
     save: 'Save',

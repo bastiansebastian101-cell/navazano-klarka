@@ -70,9 +70,9 @@ export default function AdminProductsPage() {
           {products.map((product) => (
             <div key={product.id} className="flex items-center gap-4 bg-white rounded-xl shadow-card p-4">
               <div className="w-16 h-16 bg-sage-light rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center text-2xl">
-                {product.imageUrl ? (
+                {product.imageUrls[0] ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={product.imageUrl} alt={product.nameCs} className="w-full h-full object-cover" />
+                  <img src={product.imageUrls[0]} alt={product.nameCs} className="w-full h-full object-cover" />
                 ) : (
                   '🌸'
                 )}
