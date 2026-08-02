@@ -39,6 +39,12 @@ export function AdminNav() {
           >
             {t.admin.coupons}
           </Link>
+          <Link
+            href="/admin/napady"
+            className={`text-sm font-medium ${pathname.startsWith('/admin/napady') ? 'text-brand' : 'text-ink hover:text-brand'}`}
+          >
+            {t.admin.customRequests}
+          </Link>
           <button onClick={handleLogout} className="text-sm text-ink-light hover:text-brand">
             {t.admin.logout}
           </button>

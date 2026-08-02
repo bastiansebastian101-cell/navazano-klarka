@@ -79,6 +79,15 @@ model LoginToken {
   createdAt DateTime  @default(now())
 }
 
+model CustomRequest {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  imageUrl  String?
+  createdAt DateTime @default(now())
+}
+
 model OrderItem {
   id        String @id @default(cuid())
   orderId   String

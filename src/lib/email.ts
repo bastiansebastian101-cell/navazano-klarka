@@ -12,6 +12,14 @@ function getResend(): Resend | null {
 
 const FROM = 'Navázáno by Klára <objednavky@navazano.cz>';
 
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 interface OrderEmailData {
   orderId: string;
   orderNumber: number;
@@ -134,6 +142,55 @@ export async function sendNewOrderAlertEmail(data: OrderEmailData): Promise<bool
   results.forEach(({ error }, i) => {
     if (error) {
       console.error('sendNewOrderAlertEmail failed:', notifyEmails[i], error);
+    } else {
+      anySucceeded = true;
+    }
+  });
+  return anySucceeded;
+}
+
+interface CustomRequestEmailData {
+  name: string;
+  email: string;
+  message: string;
+  imageUrl?: string | null;
+}
+
+export async function sendCustomRequestEmail(data: CustomRequestEmailData): Promise<boolean> {
+  const resend = getResend();
+  const notifyEmails = process.env.KLARKA_NOTIFY_EMAIL?.split(',').map((e) => e.trim()).filter(Boolean);
+  if (!resend || !notifyEmails?.length) return false;
+
+  const name = escapeHtml(data.name);
+  const message = escapeHtml(data.message);
+
+  const imageBlock = data.imageUrl
+    ? `<div style="margin-top:16px;"><img src="${data.imageUrl}" alt="Inspirace" style="max-width:100%;border-radius:8px;" /></div>`
+    : '';
+
+  const html = `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;">
+        <h2 style="color:#111;margin-bottom:4px;">Nové přání na míru</h2>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:12px;">
+          <tr><td style="padding:8px 0;color:#555;width:100px;">Jméno</td><td style="padding:8px 0;font-weight:600;color:#111;">${name}</td></tr>
+          <tr><td style="padding:8px 0;color:#555;">E-mail</td><td style="padding:8px 0;"><a href="mailto:${data.email}" style="color:#B8567A;">${data.email}</a></td></tr>
+        </table>
+        <div style="margin-top:16px;padding:16px;background:#FBEEF1;border-radius:8px;">
+          <p style="margin:0;color:#111;font-size:14px;white-space:pre-wrap;">${message}</p>
+        </div>
+        ${imageBlock}
+      </div>
+    `;
+  const subject = `Nové přání na míru od ${data.name}`;
+
+  const results = await Promise.all(
+    notifyEmails.map((to) => resend.emails.send({ from: FROM, to, subject, html }))
+  );
+
+  let anySucceeded = false;
+  results.forEach(({ error }, i) => {
+    if (error) {
+      console.error('sendCustomRequestEmail failed:', notifyEmails[i], error);
     } else {
       anySucceeded = true;
     }
