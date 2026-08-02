@@ -11,6 +11,7 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Product | 'new' | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -24,8 +25,20 @@ export default function AdminProductsPage() {
     load();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    await fetch(`/api/admin/products/${id}`, { method: 'DELETE' });
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`${t.admin.delete}: ${name}?`)) return;
+    const res = await fetch(`/api/admin/products/${id}`, { method: 'DELETE' });
+    const data = await res.json().catch(() => ({}));
+    setNotice(data.deactivated ? t.admin.productDeactivatedNotice : t.admin.productDeletedNotice);
+    load();
+  };
+
+  const handleReactivate = async (id: string) => {
+    await fetch(`/api/admin/products/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ active: true }),
+    });
     load();
   };
 
@@ -40,6 +53,15 @@ export default function AdminProductsPage() {
           {t.admin.addProduct}
         </button>
       </div>
+
+      {notice && (
+        <div className="mb-4 flex items-center justify-between bg-sage-light text-ink text-sm rounded-lg px-4 py-2.5">
+          <span>{notice}</span>
+          <button onClick={() => setNotice(null)} className="text-ink-light hover:text-ink">
+            ×
+          </button>
+        </div>
+      )}
 
       {loading ? null : products.length === 0 ? (
         <p className="text-ink-light">{t.admin.noProducts}</p>
@@ -60,12 +82,17 @@ export default function AdminProductsPage() {
                   {product.nameCs} {!product.active && <span className="text-xs text-ink-lighter">({product.category})</span>}
                 </p>
                 <p className="text-sm text-brand font-semibold">{formatCzk(product.priceCzk)}</p>
-                {!product.active && <p className="text-xs text-red-500">inactive</p>}
+                {!product.active && <p className="text-xs text-red-500">{t.admin.couponInactiveLabel}</p>}
               </div>
               <button onClick={() => setEditing(product)} className="text-sm text-brand hover:text-brand-hover">
                 {t.admin.edit}
               </button>
-              <button onClick={() => handleDelete(product.id)} className="text-sm text-ink-light hover:text-red-600">
+              {!product.active && (
+                <button onClick={() => handleReactivate(product.id)} className="text-sm text-sage-dark hover:text-sage">
+                  {t.admin.reactivate}
+                </button>
+              )}
+              <button onClick={() => handleDelete(product.id, product.nameCs)} className="text-sm text-ink-light hover:text-red-600">
                 {t.admin.delete}
               </button>
             </div>
