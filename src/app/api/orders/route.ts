@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { isDeliveryDateValid, isDeliveryWindowValid } from '@/lib/delivery';
 import { sendOrderConfirmationEmail, sendNewOrderAlertEmail } from '@/lib/email';
+import { findValidCoupon, calculateDiscount } from '@/lib/coupon';
 
 interface OrderRequestBody {
   customerName: string;
@@ -11,6 +12,7 @@ interface OrderRequestBody {
   deliveryDate: string; // ISO date
   deliveryWindow: string;
   notes?: string;
+  couponCode?: string;
   items: { productId: string; quantity: number }[];
 }
 
@@ -54,7 +56,26 @@ export async function POST(request: NextRequest) {
       orderItems.push({ productId: product.id, quantity: item.quantity, priceCzk: product.priceCzk });
     }
 
-    const totalCzk = orderItems.reduce((sum, i) => sum + i.priceCzk * i.quantity, 0);
+    const subtotalCzk = orderItems.reduce((sum, i) => sum + i.priceCzk * i.quantity, 0);
+
+    // Never trust a client-computed discount — re-validate the coupon and
+    // recompute it server-side from the server-priced subtotal above.
+    let discountCzk = 0;
+    let couponId: string | null = null;
+    let couponMaxRedemptions: number | null = null;
+    const couponCode = typeof body.couponCode === 'string' ? body.couponCode.trim() : '';
+
+    if (couponCode) {
+      const result = await findValidCoupon(couponCode);
+      if (!result.valid) {
+        return NextResponse.json({ error: 'invalid_coupon', reason: result.reason }, { status: 400 });
+      }
+      discountCzk = calculateDiscount(result.coupon, subtotalCzk);
+      couponId = result.coupon.id;
+      couponMaxRedemptions = result.coupon.maxRedemptions;
+    }
+
+    const totalCzk = subtotalCzk - discountCzk;
 
     const customerName = body.customerName.trim();
     const phone = body.phone.trim();
@@ -69,22 +90,51 @@ export async function POST(request: NextRequest) {
       update: { name: customerName, phone },
     });
 
-    const order = await prisma.order.create({
-      data: {
-        customerName,
-        phone,
-        email,
-        deliveryAddress: body.deliveryAddress.trim(),
-        deliveryDate,
-        deliveryWindow: body.deliveryWindow,
-        paymentMethod: 'bank_transfer', // only payment method offered — never trust client input here
-        notes: body.notes?.trim() || null,
-        totalCzk,
-        customerId: customer.id,
-        items: { create: orderItems },
-      },
-      include: { items: { include: { product: true } } },
-    });
+    let order;
+    try {
+      order = await prisma.$transaction(async (tx) => {
+        if (couponId) {
+          // Atomically claim a redemption slot — Postgres re-evaluates this
+          // WHERE against the latest committed row if a concurrent request
+          // is racing for the last slot, so this can't over-redeem a coupon.
+          const claim = await tx.coupon.updateMany({
+            where: {
+              id: couponId,
+              active: true,
+              ...(couponMaxRedemptions !== null ? { redemptionCount: { lt: couponMaxRedemptions } } : {}),
+            },
+            data: { redemptionCount: { increment: 1 } },
+          });
+          if (claim.count !== 1) {
+            throw new Error('COUPON_EXHAUSTED');
+          }
+        }
+
+        return tx.order.create({
+          data: {
+            customerName,
+            phone,
+            email,
+            deliveryAddress: body.deliveryAddress.trim(),
+            deliveryDate,
+            deliveryWindow: body.deliveryWindow,
+            paymentMethod: 'bank_transfer', // only payment method offered — never trust client input here
+            notes: body.notes?.trim() || null,
+            totalCzk,
+            discountCzk,
+            customerId: customer.id,
+            couponId,
+            items: { create: orderItems },
+          },
+          include: { items: { include: { product: true } } },
+        });
+      });
+    } catch (err) {
+      if (err instanceof Error && err.message === 'COUPON_EXHAUSTED') {
+        return NextResponse.json({ error: 'invalid_coupon', reason: 'exhausted' }, { status: 400 });
+      }
+      throw err;
+    }
 
     const emailData = {
       orderId: order.id,
@@ -95,6 +145,8 @@ export async function POST(request: NextRequest) {
       deliveryDate: order.deliveryDate,
       deliveryWindow: order.deliveryWindow,
       paymentMethod: order.paymentMethod,
+      subtotalCzk,
+      discountCzk: order.discountCzk,
       totalCzk: order.totalCzk,
       items: order.items.map((i) => ({ nameCs: i.product.nameCs, quantity: i.quantity, priceCzk: i.priceCzk })),
     };

@@ -12,6 +12,12 @@ function toDateInputValue(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
+interface AppliedCoupon {
+  code: string;
+  discountCzk: number;
+  newTotalCzk: number;
+}
+
 export default function CheckoutPage() {
   const { t } = useLanguage();
   const { items, totalCzk, clear } = useCart();
@@ -28,6 +34,54 @@ export default function CheckoutPage() {
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
+
+  const couponReasonMessage = (reason: string) => {
+    switch (reason) {
+      case 'expired':
+        return t.checkout.couponExpired;
+      case 'exhausted':
+        return t.checkout.couponExhausted;
+      case 'inactive':
+      case 'not_found':
+      default:
+        return t.checkout.couponInvalid;
+    }
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) return;
+    setApplyingCoupon(true);
+    setCouponError(null);
+    try {
+      const res = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: couponInput.trim(), subtotalCzk: totalCzk }),
+      });
+      const data = await res.json();
+      if (!data.valid) {
+        setAppliedCoupon(null);
+        setCouponError(couponReasonMessage(data.reason));
+      } else {
+        setAppliedCoupon({ code: couponInput.trim(), discountCzk: data.discountCzk, newTotalCzk: data.newTotalCzk });
+      }
+    } catch {
+      setCouponError(t.checkout.couponInvalid);
+    } finally {
+      setApplyingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput('');
+    setCouponError(null);
+  };
 
   if (items.length === 0) {
     return (
@@ -58,13 +112,22 @@ export default function CheckoutPage() {
           deliveryWindow,
           paymentMethod: 'bank_transfer',
           notes,
+          couponCode: appliedCoupon?.code,
           items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
         }),
       });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data.error === 'invalid_delivery_date' ? t.checkout.cutoffError : t.checkout.genericError);
+        if (data.error === 'invalid_delivery_date') {
+          setError(t.checkout.cutoffError);
+        } else if (data.error === 'invalid_coupon') {
+          setAppliedCoupon(null);
+          setCouponError(couponReasonMessage(data.reason));
+          setError(t.checkout.couponInvalid);
+        } else {
+          setError(t.checkout.genericError);
+        }
         setSubmitting(false);
         return;
       }
@@ -77,6 +140,8 @@ export default function CheckoutPage() {
       setSubmitting(false);
     }
   };
+
+  const finalTotal = appliedCoupon ? appliedCoupon.newTotalCzk : totalCzk;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -187,9 +252,54 @@ export default function CheckoutPage() {
             </div>
           ))}
         </div>
+
+        <div className="mt-4 pt-4 border-t border-ink-lighter/20">
+          {appliedCoupon ? (
+            <div className="flex items-center justify-between text-sm bg-sage-light rounded-lg px-3 py-2">
+              <span className="text-ink">
+                {t.checkout.couponApplied}: <span className="font-mono font-semibold">{appliedCoupon.code}</span>
+              </span>
+              <button type="button" onClick={handleRemoveCoupon} className="text-ink-light hover:text-brand text-xs">
+                {t.checkout.couponRemove}
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <input
+                placeholder={t.checkout.couponCode}
+                value={couponInput}
+                onChange={(e) => setCouponInput(e.target.value)}
+                className="flex-1 min-w-0 border border-ink-lighter/30 rounded-lg px-3 py-2 text-sm"
+              />
+              <button
+                type="button"
+                onClick={handleApplyCoupon}
+                disabled={applyingCoupon || !couponInput.trim()}
+                className="flex-shrink-0 bg-ink text-white text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50"
+              >
+                {t.checkout.couponApply}
+              </button>
+            </div>
+          )}
+          {couponError && <p className="mt-2 text-xs text-red-600">{couponError}</p>}
+        </div>
+
+        {appliedCoupon && (
+          <div className="mt-3 space-y-1 text-sm">
+            <div className="flex justify-between text-ink-light">
+              <span>{t.checkout.subtotal}</span>
+              <span>{formatCzk(totalCzk)}</span>
+            </div>
+            <div className="flex justify-between text-sage-dark">
+              <span>{t.checkout.discount}</span>
+              <span>−{formatCzk(appliedCoupon.discountCzk)}</span>
+            </div>
+          </div>
+        )}
+
         <div className="flex justify-between mt-4 pt-4 border-t border-ink-lighter/20 font-semibold">
           <span>{t.cart.total}</span>
-          <span className="text-brand">{formatCzk(totalCzk)}</span>
+          <span className="text-brand">{formatCzk(finalTotal)}</span>
         </div>
       </div>
     </div>

@@ -36,11 +36,28 @@ model Order {
   status          String    @default("new") // new | confirmed | out_for_delivery | delivered | cancelled
   notes           String?
   totalCzk        Int
+  discountCzk     Int       @default(0)
   createdAt       DateTime  @default(now())
   customerId      String?
   customer        Customer? @relation(fields: [customerId], references: [id])
+  couponId        String?
+  coupon          Coupon?   @relation(fields: [couponId], references: [id])
 
   items OrderItem[]
+}
+
+model Coupon {
+  id              String    @id @default(cuid())
+  code            String    @unique
+  discountType    String // "percentage" | "fixed"
+  discountValue   Int // percentage: 1-100; fixed: haléře
+  maxRedemptions  Int?
+  redemptionCount Int       @default(0)
+  active          Boolean   @default(true)
+  expiresAt       DateTime?
+  createdAt       DateTime  @default(now())
+
+  orders Order[]
 }
 
 model Customer {

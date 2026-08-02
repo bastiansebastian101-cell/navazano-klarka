@@ -41,7 +41,19 @@ export function OrderConfirmation({
             </div>
           ))}
         </div>
-        <div className="flex justify-between mt-4 pt-4 border-t border-ink-lighter/20 font-semibold">
+        {order.discountCzk > 0 && (
+          <div className="mt-4 pt-4 border-t border-ink-lighter/20 space-y-1 text-sm">
+            <div className="flex justify-between text-ink-light">
+              <span>{t.checkout.subtotal}</span>
+              <span>{formatCzk(order.totalCzk + order.discountCzk)}</span>
+            </div>
+            <div className="flex justify-between text-sage-dark">
+              <span>{t.checkout.discount}</span>
+              <span>−{formatCzk(order.discountCzk)}</span>
+            </div>
+          </div>
+        )}
+        <div className={`flex justify-between font-semibold ${order.discountCzk > 0 ? 'mt-1' : 'mt-4 pt-4 border-t border-ink-lighter/20'}`}>
           <span>{t.cart.total}</span>
           <span className="text-brand">{formatCzk(order.totalCzk)}</span>
         </div>

@@ -21,6 +21,8 @@ interface OrderEmailData {
   deliveryDate: Date;
   deliveryWindow: string;
   paymentMethod: string;
+  subtotalCzk?: number;
+  discountCzk?: number;
   totalCzk: number;
   items: { nameCs: string; quantity: number; priceCzk: number }[];
 }
@@ -53,6 +55,15 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
       `
       : '';
 
+  const hasDiscount = !!data.discountCzk && data.discountCzk > 0;
+  const totalsRows = hasDiscount
+    ? `
+        <tr><td style="padding:8px 0;color:#555;">Mezisoučet</td><td style="padding:8px 0;text-align:right;color:#111;">${formatCzk(data.subtotalCzk ?? data.totalCzk + data.discountCzk!)}</td></tr>
+        <tr><td style="padding:8px 0;color:#555;">Sleva</td><td style="padding:8px 0;text-align:right;color:#4FA87C;">−${formatCzk(data.discountCzk!)}</td></tr>
+        <tr><td style="padding:8px 0;font-weight:600;color:#111;">Celkem</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#B8567A;">${formatCzk(data.totalCzk)}</td></tr>
+      `
+    : `<tr><td style="padding:8px 0;font-weight:600;color:#111;">Celkem</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#B8567A;">${formatCzk(data.totalCzk)}</td></tr>`;
+
   const { error } = await resend.emails.send({
     from: FROM,
     to: data.customerEmail,
@@ -63,7 +74,7 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
         <p style="color:#777;font-size:13px;margin-bottom:24px;">Objednávka #${data.orderNumber}</p>
         <table style="width:100%;border-collapse:collapse;font-size:14px;">${itemsTable(data.items)}</table>
         <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:16px;border-top:1px solid #eee;padding-top:8px;">
-          <tr><td style="padding:8px 0;font-weight:600;color:#111;">Celkem</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#B8567A;">${formatCzk(data.totalCzk)}</td></tr>
+          ${totalsRows}
         </table>
         <div style="margin-top:20px;padding:16px;background:#FBEEF1;border-radius:8px;">
           <p style="margin:0 0 6px;color:#111;font-size:14px;"><strong>Doručení:</strong> ${dateLabel}, ${windowLabel}</p>
