@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import './globals.css';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CartProvider } from '@/contexts/CartContext';
@@ -41,6 +42,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
+
   return (
     <html lang="cs" className={`${inter.variable} ${playfair.variable}`}>
       <body className="font-sans bg-cream text-ink">
@@ -48,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CartProvider>{children}</CartProvider>
         </LanguageProvider>
       </body>
+      {gaId && <GoogleAnalytics gaId={gaId} />}
     </html>
   );
 }
