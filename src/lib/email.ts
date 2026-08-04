@@ -152,6 +152,8 @@ export async function sendNewOrderAlertEmail(data: OrderEmailData): Promise<bool
 interface CustomRequestEmailData {
   name: string;
   email: string;
+  phone: string;
+  deliveryDate: Date;
   message: string;
   imageUrl?: string | null;
 }
@@ -162,7 +164,9 @@ export async function sendCustomRequestEmail(data: CustomRequestEmailData): Prom
   if (!resend || !notifyEmails?.length) return false;
 
   const name = escapeHtml(data.name);
+  const phone = escapeHtml(data.phone);
   const message = escapeHtml(data.message);
+  const deliveryDateLabel = data.deliveryDate.toLocaleDateString('cs-CZ');
 
   const imageBlock = data.imageUrl
     ? `<div style="margin-top:16px;"><img src="${data.imageUrl}" alt="Inspirace" style="max-width:100%;border-radius:8px;" /></div>`
@@ -174,6 +178,8 @@ export async function sendCustomRequestEmail(data: CustomRequestEmailData): Prom
         <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:12px;">
           <tr><td style="padding:8px 0;color:#555;width:100px;">Jméno</td><td style="padding:8px 0;font-weight:600;color:#111;">${name}</td></tr>
           <tr><td style="padding:8px 0;color:#555;">E-mail</td><td style="padding:8px 0;"><a href="mailto:${data.email}" style="color:#B8567A;">${data.email}</a></td></tr>
+          <tr><td style="padding:8px 0;color:#555;">Telefon</td><td style="padding:8px 0;"><a href="tel:${phone}" style="color:#B8567A;">${phone}</a></td></tr>
+          <tr><td style="padding:8px 0;color:#555;">Termín doručení</td><td style="padding:8px 0;font-weight:600;color:#111;">${deliveryDateLabel}</td></tr>
         </table>
         <div style="margin-top:16px;padding:16px;background:#FBEEF1;border-radius:8px;">
           <p style="margin:0;color:#111;font-size:14px;white-space:pre-wrap;">${message}</p>

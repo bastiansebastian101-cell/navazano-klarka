@@ -1,15 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { earliestDeliveryDate } from '@/lib/delivery';
 
 const STORAGE_KEY = 'navazano_custom_popup_seen';
 
+function toDateInputValue(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
+
 export function CustomBouquetPopup() {
   const { t } = useLanguage();
+  const minDate = useMemo(() => toDateInputValue(earliestDeliveryDate()), []);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [deliveryDate, setDeliveryDate] = useState(minDate);
   const [message, setMessage] = useState('');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -31,6 +39,8 @@ export function CustomBouquetPopup() {
     if (submitted) {
       setName('');
       setEmail('');
+      setPhone('');
+      setDeliveryDate(minDate);
       setMessage('');
       setImageUrl(null);
       setSubmitted(false);
@@ -63,7 +73,7 @@ export function CustomBouquetPopup() {
       const res = await fetch('/api/custom-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, message, imageUrl }),
+        body: JSON.stringify({ name, email, phone, deliveryDate, message, imageUrl }),
       });
       if (!res.ok) throw new Error();
       setSubmitted(true);
@@ -141,6 +151,27 @@ export function CustomBouquetPopup() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      className="w-full rounded-xl border border-ink-lighter/30 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-ink-light mb-1">{t.customRequest.phone}</label>
+                    <input
+                      required
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full rounded-xl border border-ink-lighter/30 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-ink-light mb-1">{t.customRequest.deliveryDate}</label>
+                    <input
+                      required
+                      type="date"
+                      min={minDate}
+                      value={deliveryDate}
+                      onChange={(e) => setDeliveryDate(e.target.value)}
                       className="w-full rounded-xl border border-ink-lighter/30 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40"
                     />
                   </div>

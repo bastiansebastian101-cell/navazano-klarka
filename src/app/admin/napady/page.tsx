@@ -36,9 +36,21 @@ export default function AdminCustomRequestsPage() {
               )}
               <div className="min-w-0">
                 <p className="font-medium text-ink">{r.name}</p>
-                <a href={`mailto:${r.email}`} className="text-sm text-brand hover:text-brand-hover">
-                  {r.email}
-                </a>
+                <div className="flex flex-wrap gap-x-3 text-sm">
+                  <a href={`mailto:${r.email}`} className="text-brand hover:text-brand-hover">
+                    {r.email}
+                  </a>
+                  {r.phone && (
+                    <a href={`tel:${r.phone}`} className="text-brand hover:text-brand-hover">
+                      {r.phone}
+                    </a>
+                  )}
+                </div>
+                {r.deliveryDate && (
+                  <p className="mt-1 text-sm font-semibold text-ink">
+                    Doručit: {new Date(r.deliveryDate).toLocaleDateString('cs-CZ')}
+                  </p>
+                )}
                 <p className="mt-2 text-sm text-ink-light whitespace-pre-wrap">{r.message}</p>
                 <p className="mt-2 text-xs text-ink-lighter">
                   {new Date(r.createdAt).toLocaleString('cs-CZ')}
