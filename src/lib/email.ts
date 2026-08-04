@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import { formatCzk } from './format';
 import { DELIVERY_WINDOW_LABELS_CS } from './delivery-labels';
+import { generatePaymentQrDataUrl, formatIbanForDisplay } from './payment';
 
 let _resend: Resend | null = null;
 
@@ -224,6 +225,50 @@ export async function sendLoginLinkEmail(email: string, loginUrl: string): Promi
 
   if (error) {
     console.error('sendLoginLinkEmail failed:', email, error);
+    return false;
+  }
+  return true;
+}
+
+export async function sendCustomRequestInvoiceEmail(data: {
+  name: string;
+  email: string;
+  bouquetName: string;
+  priceCzk: number;
+  variableSymbol: number;
+}): Promise<boolean> {
+  const resend = getResend();
+  const iban = process.env.BANK_IBAN;
+  if (!resend || !iban) return false;
+
+  const qrDataUrl = await generatePaymentQrDataUrl({
+    amountCzk: data.priceCzk,
+    variableSymbol: data.variableSymbol,
+    message: `${data.bouquetName} - ${data.name}`,
+  });
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: data.email,
+    subject: `Platba za kytici „${data.bouquetName}“ — Navázáno by Klára`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;">
+        <h2 style="color:#111;margin-bottom:4px;">Vaše kytice na míru je připravena k zaplacení</h2>
+        <p style="color:#111;font-size:14px;line-height:1.6;">Ahoj ${data.name}, na základě vašeho přání jsme pro vás připravili kytici <strong>${data.bouquetName}</strong>. Prosíme o úhradu bankovním převodem podle údajů níže, nebo naskenujte QR kód ve své bankovní aplikaci.</p>
+        <div style="margin-top:20px;padding:16px;background:#FBEEF1;border-radius:8px;">
+          <p style="margin:0 0 6px;color:#111;font-size:14px;"><strong>Kytice:</strong> ${data.bouquetName}</p>
+          <p style="margin:0 0 6px;color:#111;font-size:14px;"><strong>Částka:</strong> ${formatCzk(data.priceCzk)}</p>
+          <p style="margin:0 0 6px;color:#111;font-size:14px;"><strong>Číslo účtu (IBAN):</strong> ${formatIbanForDisplay(iban)}</p>
+          <p style="margin:0;color:#111;font-size:14px;"><strong>Variabilní symbol:</strong> ${data.variableSymbol}</p>
+        </div>
+        ${qrDataUrl ? `<div style="margin-top:20px;text-align:center;"><img src="${qrDataUrl}" alt="QR platba" width="200" height="200" /></div>` : ''}
+        <p style="color:#999;font-size:12px;margin-top:32px;">Navázáno by Klára</p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error('sendCustomRequestInvoiceEmail failed:', data.email, error);
     return false;
   }
   return true;

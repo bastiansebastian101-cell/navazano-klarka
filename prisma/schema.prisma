@@ -80,14 +80,18 @@ model LoginToken {
 }
 
 model CustomRequest {
-  id           String    @id @default(cuid())
-  name         String
-  email        String
-  phone        String?
-  deliveryDate DateTime?
-  message      String
-  imageUrl     String?
-  createdAt    DateTime  @default(now())
+  id            String    @id @default(cuid())
+  name          String
+  email         String
+  phone         String?
+  deliveryDate  DateTime?
+  message       String
+  imageUrl      String?
+  bouquetName   String?
+  priceCzk      Int? // haléře, set by admin when creating the invoice
+  invoiceNumber Int       @unique @default(autoincrement()) // used as the QR payment variable symbol (with an offset, see src/lib/payment.ts usage)
+  invoiceSentAt DateTime?
+  createdAt     DateTime  @default(now())
 }
 
 model OrderItem {
