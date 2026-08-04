@@ -4,8 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { earliestDeliveryDate } from '@/lib/delivery';
 
-const STORAGE_KEY = 'navazano_custom_popup_seen';
-
 function toDateInputValue(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
@@ -26,11 +24,7 @@ export function CustomBouquetPopup() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || localStorage.getItem(STORAGE_KEY)) return;
-    const timer = setTimeout(() => {
-      setOpen(true);
-      localStorage.setItem(STORAGE_KEY, '1');
-    }, 1000);
+    const timer = setTimeout(() => setOpen(true), 5000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -215,6 +209,7 @@ export function CustomBouquetPopup() {
                         />
                       </label>
                     )}
+                    <p className="mt-1.5 text-xs text-ink-lighter">{t.customRequest.referencePhotoNote}</p>
                   </div>
                 </div>
 

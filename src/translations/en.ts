@@ -166,6 +166,7 @@ export const en: Translations = {
     messagePlaceholder: 'E.g. a bouquet in pastel colors, on the smaller side, for a birthday…',
     photoLabel: 'Inspiration photo (optional)',
     addPhoto: 'Add photo',
+    referencePhotoNote: 'The photo is just for inspiration — the final bouquet may vary slightly from it.',
     uploading: 'Uploading...',
     priceNote: "The price depends on the materials used. We'll let you know the price after reviewing your request.",
     submit: 'Send request',

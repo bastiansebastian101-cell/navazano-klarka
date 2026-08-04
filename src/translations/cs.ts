@@ -164,6 +164,7 @@ export const cs = {
     messagePlaceholder: 'Např. kytice v pastelových barvách, spíše menší, na narozeninovou oslavu…',
     photoLabel: 'Fotka inspirace (nepovinné)',
     addPhoto: 'Přidat fotku',
+    referencePhotoNote: 'Fotka slouží jen jako inspirace — výsledná kytice se od ní může mírně lišit.',
     uploading: 'Nahrávám...',
     priceNote: 'Cena se odvíjí od použitých materiálů. O ceně vás budeme informovat po zhodnocení vašeho přání.',
     submit: 'Odeslat přání',
