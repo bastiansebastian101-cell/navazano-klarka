@@ -22,6 +22,7 @@ export default function AdminOrdersPage() {
   const { t } = useLanguage();
   const [orders, setOrders] = useState<OrderWithItems[]>([]);
   const [loading, setLoading] = useState(true);
+  const [resendingId, setResendingId] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -42,6 +43,18 @@ export default function AdminOrdersPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
     });
+    load();
+  };
+
+  const handleResendReviewInvite = async (id: string) => {
+    setResendingId(id);
+    await fetch(`/api/admin/orders/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resendReviewInvite: true }),
+    });
+    setResendingId(null);
+    load();
   };
 
   return (
@@ -99,6 +112,19 @@ export default function AdminOrdersPage() {
                   </button>
                 ))}
               </div>
+
+              {order.reviewInviteSentAt && (
+                <div className="mt-3 flex items-center gap-3">
+                  <p className="text-xs text-sage-dark font-medium">✅ {t.admin.reviewInviteSent}</p>
+                  <button
+                    onClick={() => handleResendReviewInvite(order.id)}
+                    disabled={resendingId === order.id}
+                    className="text-xs text-brand hover:text-brand-hover font-medium"
+                  >
+                    {t.admin.resendReviewInvite}
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>

@@ -14,6 +14,8 @@ export default function AdminCustomRequestsPage() {
   const [priceCzk, setPriceCzk] = useState('');
   const [sendingId, setSendingId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [deliveringId, setDeliveringId] = useState<string | null>(null);
+  const [resendingId, setResendingId] = useState<string | null>(null);
 
   const load = async () => {
     const res = await fetch('/api/admin/custom-requests');
@@ -52,6 +54,28 @@ export default function AdminCustomRequestsPage() {
       setNotice(t.admin.invoiceSaveFailed);
     }
     setSendingId(null);
+  };
+
+  const handleMarkDelivered = async (id: string) => {
+    setDeliveringId(id);
+    await fetch(`/api/admin/custom-requests/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ markDelivered: true }),
+    });
+    setDeliveringId(null);
+    load();
+  };
+
+  const handleResendReviewInvite = async (id: string) => {
+    setResendingId(id);
+    await fetch(`/api/admin/custom-requests/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resendReviewInvite: true }),
+    });
+    setResendingId(null);
+    load();
   };
 
   return (
@@ -157,6 +181,32 @@ export default function AdminCustomRequestsPage() {
                         {t.admin.cancel}
                       </button>
                     </div>
+                  )}
+                </div>
+
+                <div className="mt-3 pt-3 border-t border-ink-lighter/15 flex flex-wrap items-center gap-3">
+                  {r.deliveredAt ? (
+                    <p className="text-sm text-sage-dark font-medium">✅ {t.admin.delivered}</p>
+                  ) : (
+                    <button
+                      onClick={() => handleMarkDelivered(r.id)}
+                      disabled={deliveringId === r.id}
+                      className="bg-gray-800 hover:bg-gray-700 disabled:opacity-60 text-white text-xs font-semibold px-4 py-2 rounded-full transition-colors"
+                    >
+                      {t.admin.markDelivered}
+                    </button>
+                  )}
+                  {r.reviewInviteSentAt && (
+                    <>
+                      <p className="text-xs text-sage-dark font-medium">✅ {t.admin.reviewInviteSent}</p>
+                      <button
+                        onClick={() => handleResendReviewInvite(r.id)}
+                        disabled={resendingId === r.id}
+                        className="text-xs text-brand hover:text-brand-hover font-medium"
+                      >
+                        {t.admin.resendReviewInvite}
+                      </button>
+                    </>
                   )}
                 </div>
               </div>

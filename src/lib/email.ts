@@ -273,3 +273,30 @@ export async function sendCustomRequestInvoiceEmail(data: {
   }
   return true;
 }
+
+export async function sendReviewInviteEmail(email: string, customerName: string, reviewUrl: string): Promise<boolean> {
+  const resend = getResend();
+  if (!resend) return false;
+
+  const name = escapeHtml(customerName);
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: email,
+    subject: 'Jak se vám líbila vaše kytice? — Navázáno by Klára',
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;">
+        <h2 style="color:#111;margin-bottom:8px;">Děkujeme za objednávku, ${name}!</h2>
+        <p style="color:#111;font-size:14px;line-height:1.6;">Doufáme, že máte z kytice radost. Bude nám velkou poctou, když nám o své zkušenosti napíšete pár slov — pomůže nám to i dalším zákazníkům.</p>
+        <a href="${reviewUrl}" style="display:inline-block;margin-top:20px;background:#F582B3;color:#fff;text-decoration:none;font-weight:600;padding:12px 28px;border-radius:999px;">Napsat recenzi</a>
+        <p style="color:#999;font-size:12px;margin-top:32px;">Navázáno by Klára</p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error('sendReviewInviteEmail failed:', email, error);
+    return false;
+  }
+  return true;
+}

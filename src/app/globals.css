@@ -14,4 +14,26 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none; /* Chrome/Safari */
   }
+
+  .animate-marquee {
+    animation: marquee 40s linear infinite;
+  }
+  .animate-marquee:hover,
+  .animate-marquee:focus-within {
+    animation-play-state: paused;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee {
+      animation: none;
+    }
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }

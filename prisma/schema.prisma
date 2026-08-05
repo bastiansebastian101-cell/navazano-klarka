@@ -42,8 +42,10 @@ model Order {
   customer        Customer? @relation(fields: [customerId], references: [id])
   couponId        String?
   coupon          Coupon?   @relation(fields: [couponId], references: [id])
+  reviewInviteSentAt DateTime?
 
-  items OrderItem[]
+  items  OrderItem[]
+  review Review?
 }
 
 model Coupon {
@@ -80,18 +82,46 @@ model LoginToken {
 }
 
 model CustomRequest {
-  id            String    @id @default(cuid())
-  name          String
-  email         String
-  phone         String?
-  deliveryDate  DateTime?
-  message       String
-  imageUrl      String?
-  bouquetName   String?
-  priceCzk      Int? // haléře, set by admin when creating the invoice
-  invoiceNumber Int       @unique @default(autoincrement()) // used as the QR payment variable symbol (with an offset, see src/lib/payment.ts usage)
-  invoiceSentAt DateTime?
-  createdAt     DateTime  @default(now())
+  id                 String    @id @default(cuid())
+  name               String
+  email              String
+  phone              String?
+  deliveryDate       DateTime?
+  message            String
+  imageUrl           String?
+  bouquetName        String?
+  priceCzk           Int? // haléře, set by admin when creating the invoice
+  invoiceNumber      Int       @unique @default(autoincrement()) // used as the QR payment variable symbol (with an offset, see src/lib/payment.ts usage)
+  invoiceSentAt      DateTime?
+  deliveredAt        DateTime?
+  reviewInviteSentAt DateTime?
+  createdAt          DateTime  @default(now())
+
+  review Review?
+}
+
+model Review {
+  id              String         @id @default(cuid())
+  customerName    String
+  rating          Int // 1-5
+  comment         String
+  orderId         String?        @unique
+  order           Order?         @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  customRequestId String?        @unique
+  customRequest   CustomRequest? @relation(fields: [customRequestId], references: [id], onDelete: SetNull)
+  editedAt        DateTime? // set when admin edits an existing review — internal audit marker, never shown publicly
+  createdAt       DateTime       @default(now())
+}
+
+model ReviewInvite {
+  id              String    @id @default(cuid())
+  token           String    @unique
+  orderId         String?
+  customRequestId String?
+  email           String
+  expiresAt       DateTime
+  usedAt          DateTime?
+  createdAt       DateTime  @default(now())
 }
 
 model OrderItem {
