@@ -23,7 +23,7 @@ export function ReviewsMarquee({ reviews }: { reviews: Review[] }) {
   return (
     <section className="py-16 overflow-hidden">
       <h2 className="font-display text-2xl text-ink text-center mb-8">{t.reviews.title}</h2>
-      <div className="flex animate-marquee">
+      <div className="flex w-max animate-marquee">
         <div className="flex">
           {reviews.map((review) => (
             <ReviewCard key={review.id} review={review} />
