@@ -28,7 +28,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   }
 
   if (body.markDelivered === true) {
-    const updated = await prisma.customRequest.update({
+    let updated = await prisma.customRequest.update({
       where: { id: existing.id },
       data: { deliveredAt: new Date() },
     });
@@ -40,7 +40,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
         customRequestId: existing.id,
       });
       if (sent) {
-        await prisma.customRequest.update({ where: { id: existing.id }, data: { reviewInviteSentAt: new Date() } });
+        updated = await prisma.customRequest.update({ where: { id: existing.id }, data: { reviewInviteSentAt: new Date() } });
       }
     }
 

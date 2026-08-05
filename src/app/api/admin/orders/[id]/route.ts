@@ -26,7 +26,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     return NextResponse.json({ error: 'invalid_status' }, { status: 400 });
   }
 
-  const order = await prisma.order.update({ where: { id: params.id }, data: { status: body.status } });
+  let order = await prisma.order.update({ where: { id: params.id }, data: { status: body.status } });
 
   if (existing.status !== 'delivered' && body.status === 'delivered' && !existing.reviewInviteSentAt) {
     const sent = await createAndSendReviewInvite({
@@ -35,7 +35,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       orderId: order.id,
     });
     if (sent) {
-      await prisma.order.update({ where: { id: order.id }, data: { reviewInviteSentAt: new Date() } });
+      order = await prisma.order.update({ where: { id: order.id }, data: { reviewInviteSentAt: new Date() } });
     }
   }
 
