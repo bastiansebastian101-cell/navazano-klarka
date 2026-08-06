@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
   const message = typeof body.message === 'string' ? body.message.trim() : '';
   const imageUrl = typeof body.imageUrl === 'string' ? body.imageUrl : null;
   const deliveryDate = typeof body.deliveryDate === 'string' ? new Date(body.deliveryDate) : null;
+  const occasionReason = typeof body.occasionReason === 'string' ? body.occasionReason.trim().slice(0, 200) || null : null;
 
   if (
     !name || !email || !phone || !message || !EMAIL_RE.test(email) ||
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
   }
 
   const customRequest = await prisma.customRequest.create({
-    data: { name, email, phone, deliveryDate, message, imageUrl },
+    data: { name, email, phone, deliveryDate, message, imageUrl, occasionReason },
   });
 
   await sendCustomRequestEmail({ name, email, phone, deliveryDate, message, imageUrl });

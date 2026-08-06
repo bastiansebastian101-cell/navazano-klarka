@@ -17,6 +17,7 @@ export function CustomBouquetPopup() {
   const [phone, setPhone] = useState('');
   const [deliveryDate, setDeliveryDate] = useState(minDate);
   const [message, setMessage] = useState('');
+  const [occasionReason, setOccasionReason] = useState('');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -36,6 +37,7 @@ export function CustomBouquetPopup() {
       setPhone('');
       setDeliveryDate(minDate);
       setMessage('');
+      setOccasionReason('');
       setImageUrl(null);
       setSubmitted(false);
       setError(null);
@@ -67,7 +69,7 @@ export function CustomBouquetPopup() {
       const res = await fetch('/api/custom-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, phone, deliveryDate, message, imageUrl }),
+        body: JSON.stringify({ name, email, phone, deliveryDate, message, imageUrl, occasionReason }),
       });
       if (!res.ok) throw new Error();
       setSubmitted(true);
@@ -178,6 +180,15 @@ export function CustomBouquetPopup() {
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder={t.customRequest.messagePlaceholder}
                       className="w-full rounded-xl border border-ink-lighter/30 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-ink-light mb-1">{t.customRequest.occasionReason}</label>
+                    <input
+                      placeholder={t.customRequest.occasionReasonPlaceholder}
+                      value={occasionReason}
+                      onChange={(e) => setOccasionReason(e.target.value)}
+                      className="w-full rounded-xl border border-ink-lighter/30 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40"
                     />
                   </div>
                   <div>

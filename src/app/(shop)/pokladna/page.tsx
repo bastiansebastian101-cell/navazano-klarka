@@ -32,6 +32,7 @@ export default function CheckoutPage() {
   const [deliveryDate, setDeliveryDate] = useState(minDate);
   const [deliveryWindow, setDeliveryWindow] = useState<DeliveryWindow>(DELIVERY_WINDOWS[0]);
   const [notes, setNotes] = useState('');
+  const [occasionReason, setOccasionReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -112,6 +113,7 @@ export default function CheckoutPage() {
           deliveryWindow,
           paymentMethod: 'bank_transfer',
           notes,
+          occasionReason,
           couponCode: appliedCoupon?.code,
           items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
         }),
@@ -225,6 +227,16 @@ export default function CheckoutPage() {
             rows={2}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
+            className="w-full border border-ink-lighter/30 rounded-lg px-4 py-2.5"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-ink mb-1.5">{t.checkout.occasionReason}</label>
+          <input
+            placeholder={t.checkout.occasionReasonPlaceholder}
+            value={occasionReason}
+            onChange={(e) => setOccasionReason(e.target.value)}
             className="w-full border border-ink-lighter/30 rounded-lg px-4 py-2.5"
           />
         </div>

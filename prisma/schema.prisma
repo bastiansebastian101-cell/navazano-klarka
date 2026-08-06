@@ -43,6 +43,8 @@ model Order {
   couponId        String?
   coupon          Coupon?   @relation(fields: [couponId], references: [id])
   reviewInviteSentAt DateTime?
+  occasionReason           String? // e.g. "manželčiny narozeniny" — free text, used for the yearly reminder email
+  occasionReminderSentYear Int? // calendar year the occasion reminder was last sent, so it fires at most once per year
 
   items  OrderItem[]
   review Review?
@@ -95,6 +97,8 @@ model CustomRequest {
   invoiceSentAt      DateTime?
   deliveredAt        DateTime?
   reviewInviteSentAt DateTime?
+  occasionReason           String?
+  occasionReminderSentYear Int?
   createdAt          DateTime  @default(now())
 
   review Review?

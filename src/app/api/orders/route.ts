@@ -13,6 +13,7 @@ interface OrderRequestBody {
   deliveryWindow: string;
   notes?: string;
   couponCode?: string;
+  occasionReason?: string;
   items: { productId: string; quantity: number }[];
 }
 
@@ -124,6 +125,7 @@ export async function POST(request: NextRequest) {
             discountCzk,
             customerId: customer.id,
             couponId,
+            occasionReason: body.occasionReason?.trim().slice(0, 200) || null,
             items: { create: orderItems },
           },
           include: { items: { include: { product: true } } },
