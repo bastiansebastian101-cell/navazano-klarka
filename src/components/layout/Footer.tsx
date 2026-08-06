@@ -39,6 +39,9 @@ export function Footer() {
           © {new Date().getFullYear()} Navázáno by Klára. {t.footer.rights}
         </p>
       </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
+        <p className="text-xs text-ink-lighter text-center sm:text-left">{t.footer.deliveryArea}</p>
+      </div>
     </footer>
   );
 }

@@ -158,6 +158,7 @@ export const en: Translations = {
   },
   footer: {
     rights: 'All rights reserved.',
+    deliveryArea: 'We currently deliver only to České Budějovice and the surrounding area (postal codes 370–373).',
   },
   account: {
     loginTitle: 'Log in',

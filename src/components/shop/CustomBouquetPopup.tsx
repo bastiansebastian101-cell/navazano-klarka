@@ -133,6 +133,7 @@ export function CustomBouquetPopup() {
               <form onSubmit={handleSubmit}>
                 <h3 className="font-display text-xl text-ink pr-6">{t.customRequest.title}</h3>
                 <p className="mt-2 text-sm text-ink-light">{t.customRequest.intro}</p>
+                <p className="mt-1 text-xs text-ink-lighter">{t.footer.deliveryArea}</p>
 
                 <div className="mt-5 space-y-4">
                   <div>

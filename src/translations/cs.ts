@@ -156,6 +156,7 @@ export const cs = {
   },
   footer: {
     rights: 'Všechna práva vyhrazena.',
+    deliveryArea: 'Doručujeme pouze do Českých Budějovic a blízkého okolí (PSČ 370–373).',
   },
   account: {
     loginTitle: 'Přihlášení',

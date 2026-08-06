@@ -188,6 +188,7 @@ export default function CheckoutPage() {
             onChange={(e) => setDeliveryAddress(e.target.value)}
             className="w-full border border-ink-lighter/30 rounded-lg px-4 py-2.5"
           />
+          <p className="mt-1.5 text-xs text-ink-lighter">{t.footer.deliveryArea}</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
