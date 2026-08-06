@@ -21,11 +21,12 @@ export async function POST(request: NextRequest) {
   const deliveryDate = typeof body.deliveryDate === 'string' ? new Date(body.deliveryDate) : null;
   const occasionReason = typeof body.occasionReason === 'string' ? body.occasionReason.trim().slice(0, 200) || null : null;
 
-  if (
-    !name || !email || !phone || !message || !EMAIL_RE.test(email) ||
-    !deliveryDate || isNaN(deliveryDate.getTime()) || !isDeliveryDateValid(deliveryDate)
-  ) {
+  if (!name || !email || !phone || !message || !EMAIL_RE.test(email) || !deliveryDate || isNaN(deliveryDate.getTime())) {
     return NextResponse.json({ error: 'invalid_input' }, { status: 400 });
+  }
+
+  if (!isDeliveryDateValid(deliveryDate)) {
+    return NextResponse.json({ error: 'invalid_delivery_date' }, { status: 400 });
   }
 
   const customRequest = await prisma.customRequest.create({

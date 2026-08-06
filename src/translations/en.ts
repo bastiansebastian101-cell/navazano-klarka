@@ -195,6 +195,7 @@ export const en: Translations = {
     close: 'Close',
     floatingButton: 'Custom bouquet',
     genericError: 'Something went wrong. Please try again.',
+    cutoffError: 'The selected delivery date is no longer available — please choose a later date.',
   },
   reviewForm: {
     title: 'Write us a review',

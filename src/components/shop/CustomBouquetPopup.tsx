@@ -71,7 +71,11 @@ export function CustomBouquetPopup() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, phone, deliveryDate, message, imageUrl, occasionReason }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error === 'invalid_delivery_date' ? t.customRequest.cutoffError : t.customRequest.genericError);
+        return;
+      }
       setSubmitted(true);
     } catch {
       setError(t.customRequest.genericError);

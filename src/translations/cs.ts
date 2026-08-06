@@ -193,6 +193,7 @@ export const cs = {
     close: 'Zavřít',
     floatingButton: 'Kytice na míru',
     genericError: 'Něco se nepovedlo. Zkuste to prosím znovu.',
+    cutoffError: 'Vybrané datum doručení už není možné — vyberte prosím pozdější termín.',
   },
   reviewForm: {
     title: 'Napište nám recenzi',
