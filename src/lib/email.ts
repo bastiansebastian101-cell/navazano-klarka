@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 import { formatCzk } from './format';
 import { DELIVERY_WINDOW_LABELS_CS } from './delivery-labels';
-import { generatePaymentQrDataUrl, formatIbanForDisplay } from './payment';
+import { generatePaymentQrAsset, formatIbanForDisplay } from './payment';
 
 let _resend: Resend | null = null;
 
@@ -241,7 +241,7 @@ export async function sendCustomRequestInvoiceEmail(data: {
   const iban = process.env.BANK_IBAN;
   if (!resend || !iban) return false;
 
-  const qrDataUrl = await generatePaymentQrDataUrl({
+  const qrAsset = await generatePaymentQrAsset({
     amountCzk: data.priceCzk,
     variableSymbol: data.variableSymbol,
     message: `${data.bouquetName} - ${data.name}`,
@@ -254,21 +254,55 @@ export async function sendCustomRequestInvoiceEmail(data: {
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;">
         <h2 style="color:#111;margin-bottom:4px;">Vaše kytice na míru je připravena k zaplacení</h2>
-        <p style="color:#111;font-size:14px;line-height:1.6;">Ahoj ${data.name}, na základě vašeho přání jsme pro vás připravili kytici <strong>${data.bouquetName}</strong>. Prosíme o úhradu bankovním převodem podle údajů níže, nebo naskenujte QR kód ve své bankovní aplikaci.</p>
+        <p style="color:#111;font-size:14px;line-height:1.6;">Ahoj ${data.name}, na základě vašeho přání jsme pro vás připravili kytici <strong>${data.bouquetName}</strong>. Prosíme o úhradu bankovním převodem podle údajů níže, nebo naskenujte QR kód ve své bankovní aplikaci (přiložen také jako příloha e-mailu).</p>
         <div style="margin-top:20px;padding:16px;background:#FBEEF1;border-radius:8px;">
           <p style="margin:0 0 6px;color:#111;font-size:14px;"><strong>Kytice:</strong> ${data.bouquetName}</p>
           <p style="margin:0 0 6px;color:#111;font-size:14px;"><strong>Částka:</strong> ${formatCzk(data.priceCzk)}</p>
           <p style="margin:0 0 6px;color:#111;font-size:14px;"><strong>Číslo účtu (IBAN):</strong> ${formatIbanForDisplay(iban)}</p>
           <p style="margin:0;color:#111;font-size:14px;"><strong>Variabilní symbol:</strong> ${data.variableSymbol}</p>
         </div>
-        ${qrDataUrl ? `<div style="margin-top:20px;text-align:center;"><img src="${qrDataUrl}" alt="QR platba" width="200" height="200" /></div>` : ''}
+        ${qrAsset ? `<div style="margin-top:20px;text-align:center;"><img src="${qrAsset.url}" alt="QR platba" width="200" height="200" /></div>` : ''}
+        <p style="color:#999;font-size:12px;margin-top:32px;">Navázáno by Klára</p>
+      </div>
+    `,
+    attachments: qrAsset ? [{ filename: 'qr-platba.png', content: qrAsset.buffer }] : undefined,
+  });
+
+  if (error) {
+    console.error('sendCustomRequestInvoiceEmail failed:', data.email, error);
+    return false;
+  }
+  return true;
+}
+
+export async function sendOccasionReminderEmail(
+  email: string,
+  customerName: string,
+  occasionReason: string,
+  buyAgainUrl: string
+): Promise<boolean> {
+  const resend = getResend();
+  if (!resend) return false;
+
+  const name = escapeHtml(customerName);
+  const reason = escapeHtml(occasionReason);
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: email,
+    subject: 'Před rokem jste udělali radost krásnou kyticí — co letos?',
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;">
+        <h2 style="color:#111;margin-bottom:8px;">Ahoj ${name},</h2>
+        <p style="color:#111;font-size:14px;line-height:1.6;">před rokem jste si u nás objednali nádhernou kytici k příležitosti <strong>${reason}</strong>. Blíží se stejný den — nechcete tentokrát udělat radost znovu?</p>
+        <a href="${buyAgainUrl}" style="display:inline-block;margin-top:20px;background:#F582B3;color:#fff;text-decoration:none;font-weight:600;padding:12px 28px;border-radius:999px;">Koupit a udělat radost</a>
         <p style="color:#999;font-size:12px;margin-top:32px;">Navázáno by Klára</p>
       </div>
     `,
   });
 
   if (error) {
-    console.error('sendCustomRequestInvoiceEmail failed:', data.email, error);
+    console.error('sendOccasionReminderEmail failed:', email, error);
     return false;
   }
   return true;

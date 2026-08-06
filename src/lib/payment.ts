@@ -1,4 +1,5 @@
 import QRCode from 'qrcode';
+import { put } from '@vercel/blob';
 
 // Czech "QR Platba" standard (SPD - Short Payment Descriptor).
 // Spec: https://qr-platba.cz/pro-vyvojare/specifikace-formatu/
@@ -26,6 +27,28 @@ export async function generatePaymentQrDataUrl(params: {
 
   const spd = buildSpdString({ iban, amountCzk: params.amountCzk, variableSymbol: params.variableSymbol, message: params.message });
   return QRCode.toDataURL(spd, { errorCorrectionLevel: 'M', margin: 1, width: 240 });
+}
+
+// Most email clients (Gmail included) strip or refuse to render inline
+// `data:` URI images for security reasons, so a QR code meant to be used in
+// an email needs to be a real hosted image (for inline display) AND a real
+// file attachment (so it's guaranteed openable even with images blocked).
+export async function generatePaymentQrAsset(params: {
+  amountCzk: number;
+  variableSymbol: number;
+  message: string;
+}): Promise<{ buffer: Buffer; url: string } | null> {
+  const iban = process.env.BANK_IBAN;
+  if (!iban) return null;
+
+  const spd = buildSpdString({ iban, amountCzk: params.amountCzk, variableSymbol: params.variableSymbol, message: params.message });
+  const buffer = await QRCode.toBuffer(spd, { errorCorrectionLevel: 'M', margin: 1, width: 240 });
+  const blob = await put(`payment-qr/${params.variableSymbol}.png`, buffer, {
+    access: 'public',
+    contentType: 'image/png',
+    addRandomSuffix: true,
+  });
+  return { buffer, url: blob.url };
 }
 
 export function formatIbanForDisplay(iban: string): string {
