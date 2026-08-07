@@ -15,6 +15,7 @@ export function CustomBouquetPopup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
   const [deliveryDate, setDeliveryDate] = useState(minDate);
   const [message, setMessage] = useState('');
   const [occasionReason, setOccasionReason] = useState('');
@@ -35,6 +36,7 @@ export function CustomBouquetPopup() {
       setName('');
       setEmail('');
       setPhone('');
+      setDeliveryAddress('');
       setDeliveryDate(minDate);
       setMessage('');
       setOccasionReason('');
@@ -69,7 +71,7 @@ export function CustomBouquetPopup() {
       const res = await fetch('/api/custom-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, phone, deliveryDate, message, imageUrl, occasionReason }),
+        body: JSON.stringify({ name, email, phone, deliveryAddress, deliveryDate, message, imageUrl, occasionReason }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -133,7 +135,6 @@ export function CustomBouquetPopup() {
               <form onSubmit={handleSubmit}>
                 <h3 className="font-display text-xl text-ink pr-6">{t.customRequest.title}</h3>
                 <p className="mt-2 text-sm text-ink-light">{t.customRequest.intro}</p>
-                <p className="mt-1 text-xs text-ink-lighter">{t.footer.deliveryArea}</p>
 
                 <div className="mt-5 space-y-4">
                   <div>
@@ -164,6 +165,17 @@ export function CustomBouquetPopup() {
                       onChange={(e) => setPhone(e.target.value)}
                       className="w-full rounded-xl border border-ink-lighter/30 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40"
                     />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-ink-light mb-1">{t.customRequest.deliveryAddress}</label>
+                    <textarea
+                      required
+                      rows={2}
+                      value={deliveryAddress}
+                      onChange={(e) => setDeliveryAddress(e.target.value)}
+                      className="w-full rounded-xl border border-ink-lighter/30 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/40 resize-none"
+                    />
+                    <p className="mt-1.5 text-xs text-ink-lighter">{t.footer.deliveryArea}</p>
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-ink-light mb-1">{t.customRequest.deliveryDate}</label>

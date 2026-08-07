@@ -154,6 +154,7 @@ interface CustomRequestEmailData {
   name: string;
   email: string;
   phone: string;
+  deliveryAddress: string;
   deliveryDate: Date;
   message: string;
   imageUrl?: string | null;
@@ -166,6 +167,7 @@ export async function sendCustomRequestEmail(data: CustomRequestEmailData): Prom
 
   const name = escapeHtml(data.name);
   const phone = escapeHtml(data.phone);
+  const deliveryAddress = escapeHtml(data.deliveryAddress);
   const message = escapeHtml(data.message);
   const deliveryDateLabel = data.deliveryDate.toLocaleDateString('cs-CZ');
 
@@ -180,6 +182,7 @@ export async function sendCustomRequestEmail(data: CustomRequestEmailData): Prom
           <tr><td style="padding:8px 0;color:#555;width:100px;">Jméno</td><td style="padding:8px 0;font-weight:600;color:#111;">${name}</td></tr>
           <tr><td style="padding:8px 0;color:#555;">E-mail</td><td style="padding:8px 0;"><a href="mailto:${data.email}" style="color:#B8567A;">${data.email}</a></td></tr>
           <tr><td style="padding:8px 0;color:#555;">Telefon</td><td style="padding:8px 0;"><a href="tel:${phone}" style="color:#B8567A;">${phone}</a></td></tr>
+          <tr><td style="padding:8px 0;color:#555;">Adresa doručení</td><td style="padding:8px 0;font-weight:600;color:#111;">${deliveryAddress}</td></tr>
           <tr><td style="padding:8px 0;color:#555;">Termín doručení</td><td style="padding:8px 0;font-weight:600;color:#111;">${deliveryDateLabel}</td></tr>
         </table>
         <div style="margin-top:16px;padding:16px;background:#FBEEF1;border-radius:8px;">

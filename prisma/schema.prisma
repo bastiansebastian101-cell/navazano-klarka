@@ -89,6 +89,7 @@ model CustomRequest {
   email              String
   phone              String?
   deliveryDate       DateTime?
+  deliveryAddress    String? // nullable for backward-compat with pre-existing rows; required client+server-side for new submissions
   message            String
   imageUrl           String?
   bouquetName        String?

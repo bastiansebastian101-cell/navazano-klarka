@@ -179,6 +179,7 @@ export const en: Translations = {
     name: 'Name',
     email: 'Email',
     phone: 'Phone',
+    deliveryAddress: 'Delivery address',
     deliveryDate: 'When do you need the bouquet delivered',
     message: 'Describe what you have in mind',
     messagePlaceholder: 'E.g. a bouquet in pastel colors, on the smaller side, for a birthday…',

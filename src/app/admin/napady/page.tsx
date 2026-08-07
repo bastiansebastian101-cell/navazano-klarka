@@ -120,6 +120,7 @@ export default function AdminCustomRequestsPage() {
                     Doručit: {new Date(r.deliveryDate).toLocaleDateString('cs-CZ')}
                   </p>
                 )}
+                {r.deliveryAddress && <p className="mt-0.5 text-sm text-ink-light">{r.deliveryAddress}</p>}
                 <p className="mt-2 text-sm text-ink-light whitespace-pre-wrap">{r.message}</p>
                 <p className="mt-2 text-xs text-ink-lighter">
                   {new Date(r.createdAt).toLocaleString('cs-CZ')}

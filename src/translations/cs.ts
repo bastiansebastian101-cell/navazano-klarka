@@ -177,6 +177,7 @@ export const cs = {
     name: 'Jméno',
     email: 'E-mail',
     phone: 'Telefon',
+    deliveryAddress: 'Doručovací adresa',
     deliveryDate: 'Kdy potřebujete kytici doručit',
     message: 'Popište svou představu',
     messagePlaceholder: 'Např. kytice v pastelových barvách, spíše menší, na narozeninovou oslavu…',

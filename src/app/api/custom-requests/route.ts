@@ -16,12 +16,16 @@ export async function POST(request: NextRequest) {
   const name = typeof body.name === 'string' ? body.name.trim() : '';
   const email = typeof body.email === 'string' ? body.email.trim() : '';
   const phone = typeof body.phone === 'string' ? body.phone.trim() : '';
+  const deliveryAddress = typeof body.deliveryAddress === 'string' ? body.deliveryAddress.trim() : '';
   const message = typeof body.message === 'string' ? body.message.trim() : '';
   const imageUrl = typeof body.imageUrl === 'string' ? body.imageUrl : null;
   const deliveryDate = typeof body.deliveryDate === 'string' ? new Date(body.deliveryDate) : null;
   const occasionReason = typeof body.occasionReason === 'string' ? body.occasionReason.trim().slice(0, 200) || null : null;
 
-  if (!name || !email || !phone || !message || !EMAIL_RE.test(email) || !deliveryDate || isNaN(deliveryDate.getTime())) {
+  if (
+    !name || !email || !phone || !deliveryAddress || !message ||
+    !EMAIL_RE.test(email) || !deliveryDate || isNaN(deliveryDate.getTime())
+  ) {
     return NextResponse.json({ error: 'invalid_input' }, { status: 400 });
   }
 
@@ -30,10 +34,10 @@ export async function POST(request: NextRequest) {
   }
 
   const customRequest = await prisma.customRequest.create({
-    data: { name, email, phone, deliveryDate, message, imageUrl, occasionReason },
+    data: { name, email, phone, deliveryAddress, deliveryDate, message, imageUrl, occasionReason },
   });
 
-  await sendCustomRequestEmail({ name, email, phone, deliveryDate, message, imageUrl });
+  await sendCustomRequestEmail({ name, email, phone, deliveryAddress, deliveryDate, message, imageUrl });
 
   return NextResponse.json({ success: true, id: customRequest.id });
 }
