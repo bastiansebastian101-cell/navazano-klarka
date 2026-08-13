@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { formatCzk } from '@/lib/format';
 
 const DPH_RATE = 21; // %, fixed Czech standard VAT rate
 
@@ -15,17 +14,28 @@ const CHANNELS = [
 
 type ChannelKey = (typeof CHANNELS)[number]['key'];
 
+function toNumber(value: string): number {
+  const n = parseFloat(value.replace(',', '.'));
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
+
+function formatExact(amount: number): string {
+  return `${amount.toLocaleString('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kč`;
+}
+
 export default function ProfitCalculatorPage() {
   const { t } = useLanguage();
-  const [flowerCost, setFlowerCost] = useState(0);
-  const [wrapCost, setWrapCost] = useState(0);
-  const [salePrices, setSalePrices] = useState<Record<ChannelKey, number>>({
-    website: 0,
-    foodora: 0,
-    wolt: 0,
-    bolt: 0,
+  const [flowerCostInput, setFlowerCostInput] = useState('');
+  const [wrapCostInput, setWrapCostInput] = useState('');
+  const [salePriceInputs, setSalePriceInputs] = useState<Record<ChannelKey, string>>({
+    website: '',
+    foodora: '',
+    wolt: '',
+    bolt: '',
   });
 
+  const flowerCost = toNumber(flowerCostInput);
+  const wrapCost = toNumber(wrapCostInput);
   const totalCost = flowerCost + wrapCost;
 
   return (
@@ -37,20 +47,22 @@ export default function ProfitCalculatorPage() {
         <div>
           <label className="block text-sm text-ink-light mb-1">{t.admin.flowerCost}</label>
           <input
-            type="number"
-            min={0}
-            value={flowerCost}
-            onChange={(e) => setFlowerCost(Math.max(0, Number(e.target.value) || 0))}
+            type="text"
+            inputMode="decimal"
+            placeholder="0"
+            value={flowerCostInput}
+            onChange={(e) => setFlowerCostInput(e.target.value)}
             className="w-full border border-ink-lighter/30 rounded-lg px-4 py-2.5"
           />
         </div>
         <div>
           <label className="block text-sm text-ink-light mb-1">{t.admin.wrapCost}</label>
           <input
-            type="number"
-            min={0}
-            value={wrapCost}
-            onChange={(e) => setWrapCost(Math.max(0, Number(e.target.value) || 0))}
+            type="text"
+            inputMode="decimal"
+            placeholder="0"
+            value={wrapCostInput}
+            onChange={(e) => setWrapCostInput(e.target.value)}
             className="w-full border border-ink-lighter/30 rounded-lg px-4 py-2.5"
           />
         </div>
@@ -58,7 +70,7 @@ export default function ProfitCalculatorPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {CHANNELS.map((channel) => {
-          const salePrice = salePrices[channel.key];
+          const salePrice = toNumber(salePriceInputs[channel.key]);
           const dph = (salePrice * DPH_RATE) / (100 + DPH_RATE);
           const commission = (salePrice * channel.commissionPercent) / 100;
           const profit = salePrice - dph - commission - totalCost;
@@ -72,34 +84,35 @@ export default function ProfitCalculatorPage() {
 
               <label className="block text-xs text-ink-light mb-1">{t.admin.salePrice}</label>
               <input
-                type="number"
-                min={0}
-                value={salePrice}
+                type="text"
+                inputMode="decimal"
+                placeholder="0"
+                value={salePriceInputs[channel.key]}
                 onChange={(e) =>
-                  setSalePrices((prev) => ({ ...prev, [channel.key]: Math.max(0, Number(e.target.value) || 0) }))
+                  setSalePriceInputs((prev) => ({ ...prev, [channel.key]: e.target.value }))
                 }
                 className="w-full border border-ink-lighter/30 rounded-lg px-3 py-2 mb-3"
               />
 
-              <div className="space-y-1 text-sm text-ink-light border-t border-ink-lighter/15 pt-3">
-                <div className="flex justify-between">
-                  <span>{t.admin.dphLabel}</span>
-                  <span>−{formatCzk(dph * 100)}</span>
+              <div className="space-y-1.5 text-sm text-ink-light border-t border-ink-lighter/15 pt-3">
+                <div className="flex justify-between items-baseline gap-2">
+                  <span className="whitespace-nowrap">{t.admin.dphLabel}</span>
+                  <span className="whitespace-nowrap">−{formatExact(dph)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>{t.admin.commissionAmountLabel}</span>
-                  <span>−{formatCzk(commission * 100)}</span>
+                <div className="flex justify-between items-baseline gap-2">
+                  <span className="whitespace-nowrap">{t.admin.commissionAmountLabel}</span>
+                  <span className="whitespace-nowrap">−{formatExact(commission)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>{t.admin.costLabel}</span>
-                  <span>−{formatCzk(totalCost * 100)}</span>
+                <div className="flex justify-between items-baseline gap-2">
+                  <span className="whitespace-nowrap">{t.admin.costLabel}</span>
+                  <span className="whitespace-nowrap">−{formatExact(totalCost)}</span>
                 </div>
               </div>
 
-              <div className="flex justify-between items-center mt-3 pt-3 border-t border-ink-lighter/20">
-                <span className="font-medium text-ink">{t.admin.profitLabel}</span>
-                <span className={`font-semibold ${profit < 0 ? 'text-red-600' : 'text-sage-dark'}`}>
-                  {formatCzk(profit * 100)}
+              <div className="flex justify-between items-baseline gap-2 mt-3 pt-3 border-t border-ink-lighter/20">
+                <span className="font-medium text-ink whitespace-nowrap">{t.admin.profitLabel}</span>
+                <span className={`font-semibold whitespace-nowrap ${profit < 0 ? 'text-red-600' : 'text-sage-dark'}`}>
+                  {formatExact(profit)}
                 </span>
               </div>
             </div>
