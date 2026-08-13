@@ -68,7 +68,7 @@ export default function ProfitCalculatorPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {CHANNELS.map((channel) => {
           const hasSalePrice = salePriceInputs[channel.key].trim() !== '';
           const salePrice = toNumber(salePriceInputs[channel.key]);
@@ -97,28 +97,28 @@ export default function ProfitCalculatorPage() {
 
               {!hasSalePrice && <p className="text-xs text-brand mb-3">{t.admin.enterSalePriceHint}</p>}
 
-              <div className="space-y-1.5 text-sm text-ink-light border-t border-ink-lighter/15 pt-3">
-                <div className="flex justify-between items-baseline gap-2">
-                  <span className="whitespace-nowrap">{t.admin.dphLabel}</span>
-                  <span className="whitespace-nowrap">{hasSalePrice ? `−${formatExact(dph)}` : '—'}</span>
+              <div className="space-y-2.5 text-sm text-ink-light border-t border-ink-lighter/15 pt-3">
+                <div>
+                  <p>{t.admin.dphLabel}</p>
+                  <p className="text-right font-medium text-ink">{hasSalePrice ? `−${formatExact(dph)}` : '—'}</p>
                 </div>
-                <div className="flex justify-between items-baseline gap-2">
-                  <span className="whitespace-nowrap">
+                <div>
+                  <p>
                     {t.admin.commissionAmountLabel} ({channel.commissionPercent}%)
-                  </span>
-                  <span className="whitespace-nowrap">{hasSalePrice ? `−${formatExact(commission)}` : '—'}</span>
+                  </p>
+                  <p className="text-right font-medium text-ink">{hasSalePrice ? `−${formatExact(commission)}` : '—'}</p>
                 </div>
-                <div className="flex justify-between items-baseline gap-2">
-                  <span className="whitespace-nowrap">{t.admin.costLabel}</span>
-                  <span className="whitespace-nowrap">−{formatExact(totalCost)}</span>
+                <div>
+                  <p>{t.admin.costLabel}</p>
+                  <p className="text-right font-medium text-ink">−{formatExact(totalCost)}</p>
                 </div>
               </div>
 
-              <div className="flex justify-between items-baseline gap-2 mt-3 pt-3 border-t border-ink-lighter/20">
-                <span className="font-medium text-ink whitespace-nowrap">{t.admin.profitLabel}</span>
-                <span className={`font-semibold whitespace-nowrap ${profit < 0 ? 'text-red-600' : 'text-sage-dark'}`}>
+              <div className="mt-3 pt-3 border-t border-ink-lighter/20">
+                <p className="font-medium text-ink">{t.admin.profitLabel}</p>
+                <p className={`text-right text-lg font-semibold ${profit < 0 ? 'text-red-600' : 'text-sage-dark'}`}>
                   {hasSalePrice ? formatExact(profit) : `−${formatExact(totalCost)}`}
-                </span>
+                </p>
               </div>
             </div>
           );
