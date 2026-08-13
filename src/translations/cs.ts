@@ -99,6 +99,7 @@ export const cs = {
     descriptionEn: 'Popis (anglicky)',
     priceCzk: 'Cena (Kč)',
     category: 'Kategorie',
+    categoryPlaceholder: 'Např. Kytice, Rostliny, Dárky',
     image: 'Fotka',
     uploadImage: 'Nahrát fotku',
     upTo3Photos: 'max. 3 fotky',

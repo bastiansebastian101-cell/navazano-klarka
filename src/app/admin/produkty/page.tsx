@@ -103,6 +103,7 @@ export default function AdminProductsPage() {
       {editing && (
         <ProductFormModal
           product={editing === 'new' ? null : editing}
+          existingCategories={Array.from(new Set(products.map((p) => p.category))).sort()}
           onClose={() => setEditing(null)}
           onSaved={() => {
             setEditing(null);

@@ -4,15 +4,16 @@ import { useState } from 'react';
 import type { Product } from '@prisma/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-const CATEGORIES = ['bouquet', 'plant', 'gift'] as const;
 const MAX_IMAGES = 3;
 
 export function ProductFormModal({
   product,
+  existingCategories,
   onClose,
   onSaved,
 }: {
   product: Product | null;
+  existingCategories: string[];
   onClose: () => void;
   onSaved: () => void;
 }) {
@@ -128,17 +129,18 @@ export function ProductFormModal({
             </div>
             <div>
               <label className="block text-sm text-ink-light mb-1">{t.admin.category}</label>
-              <select
+              <input
+                list="category-suggestions"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
+                placeholder={t.admin.categoryPlaceholder}
                 className="w-full border border-ink-lighter/30 rounded-lg px-4 py-2.5"
-              >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
+              />
+              <datalist id="category-suggestions">
+                {existingCategories.map((c) => (
+                  <option key={c} value={c} />
                 ))}
-              </select>
+              </datalist>
             </div>
           </div>
 

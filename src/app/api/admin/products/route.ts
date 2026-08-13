@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       descriptionCs: body.descriptionCs?.trim() ?? '',
       descriptionEn: body.descriptionEn?.trim() ?? '',
       priceCzk: body.priceCzk,
-      category: body.category ?? 'bouquet',
+      category: typeof body.category === 'string' && body.category.trim() ? body.category.trim() : 'bouquet',
       imageUrls,
       active: body.active ?? true,
     },

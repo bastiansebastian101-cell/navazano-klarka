@@ -12,7 +12,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   if (typeof body.descriptionCs === 'string') data.descriptionCs = body.descriptionCs.trim();
   if (typeof body.descriptionEn === 'string') data.descriptionEn = body.descriptionEn.trim();
   if (Number.isInteger(body.priceCzk) && body.priceCzk >= 0) data.priceCzk = body.priceCzk;
-  if (typeof body.category === 'string') data.category = body.category;
+  if (typeof body.category === 'string' && body.category.trim()) data.category = body.category.trim();
   if (Array.isArray(body.imageUrls) && body.imageUrls.every((u: unknown) => typeof u === 'string')) {
     data.imageUrls = body.imageUrls.slice(0, 3);
   }

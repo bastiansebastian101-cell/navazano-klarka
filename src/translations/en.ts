@@ -101,6 +101,7 @@ export const en: Translations = {
     descriptionEn: 'Description (English)',
     priceCzk: 'Price (Kč)',
     category: 'Category',
+    categoryPlaceholder: 'E.g. Bouquets, Plants, Gifts',
     image: 'Photo',
     uploadImage: 'Upload photo',
     upTo3Photos: 'up to 3 photos',
