@@ -51,6 +51,12 @@ export function AdminNav() {
           >
             {t.admin.reviews}
           </Link>
+          <Link
+            href="/admin/kalkulacka"
+            className={`text-sm font-medium ${pathname.startsWith('/admin/kalkulacka') ? 'text-brand' : 'text-ink hover:text-brand'}`}
+          >
+            {t.admin.calculator}
+          </Link>
           <button onClick={handleLogout} className="text-sm text-ink-light hover:text-brand">
             {t.admin.logout}
           </button>
