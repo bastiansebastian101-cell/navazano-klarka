@@ -70,6 +70,7 @@ export default function ProfitCalculatorPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {CHANNELS.map((channel) => {
+          const hasSalePrice = salePriceInputs[channel.key].trim() !== '';
           const salePrice = toNumber(salePriceInputs[channel.key]);
           const dph = (salePrice * DPH_RATE) / (100 + DPH_RATE);
           const commission = (salePrice * channel.commissionPercent) / 100;
@@ -94,14 +95,18 @@ export default function ProfitCalculatorPage() {
                 className="w-full border border-ink-lighter/30 rounded-lg px-3 py-2 mb-3"
               />
 
+              {!hasSalePrice && <p className="text-xs text-brand mb-3">{t.admin.enterSalePriceHint}</p>}
+
               <div className="space-y-1.5 text-sm text-ink-light border-t border-ink-lighter/15 pt-3">
                 <div className="flex justify-between items-baseline gap-2">
                   <span className="whitespace-nowrap">{t.admin.dphLabel}</span>
-                  <span className="whitespace-nowrap">−{formatExact(dph)}</span>
+                  <span className="whitespace-nowrap">{hasSalePrice ? `−${formatExact(dph)}` : '—'}</span>
                 </div>
                 <div className="flex justify-between items-baseline gap-2">
-                  <span className="whitespace-nowrap">{t.admin.commissionAmountLabel}</span>
-                  <span className="whitespace-nowrap">−{formatExact(commission)}</span>
+                  <span className="whitespace-nowrap">
+                    {t.admin.commissionAmountLabel} ({channel.commissionPercent}%)
+                  </span>
+                  <span className="whitespace-nowrap">{hasSalePrice ? `−${formatExact(commission)}` : '—'}</span>
                 </div>
                 <div className="flex justify-between items-baseline gap-2">
                   <span className="whitespace-nowrap">{t.admin.costLabel}</span>
@@ -112,7 +117,7 @@ export default function ProfitCalculatorPage() {
               <div className="flex justify-between items-baseline gap-2 mt-3 pt-3 border-t border-ink-lighter/20">
                 <span className="font-medium text-ink whitespace-nowrap">{t.admin.profitLabel}</span>
                 <span className={`font-semibold whitespace-nowrap ${profit < 0 ? 'text-red-600' : 'text-sage-dark'}`}>
-                  {formatExact(profit)}
+                  {hasSalePrice ? formatExact(profit) : `−${formatExact(totalCost)}`}
                 </span>
               </div>
             </div>

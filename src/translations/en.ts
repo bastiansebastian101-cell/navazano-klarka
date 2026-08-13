@@ -159,6 +159,7 @@ export const en: Translations = {
     calculator: 'Calculator',
     calculatorTitle: 'Profit calculator',
     calculatorIntro: 'Enter the bouquet cost and sale price for each channel — commission and VAT are calculated automatically.',
+    enterSalePriceHint: 'Enter a sale price to see the breakdown.',
     flowerCost: 'Flower cost (Kč)',
     wrapCost: 'Wrap/packaging cost (Kč)',
     salePrice: 'Sale price (Kč, VAT incl.)',
