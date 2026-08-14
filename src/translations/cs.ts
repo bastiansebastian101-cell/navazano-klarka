@@ -158,6 +158,7 @@ export const cs = {
     calculatorTitle: 'Kalkulačka zisku',
     calculatorIntro: 'Zadejte náklady na kytici a prodejní cenu pro každý kanál — provize a DPH se počítají automaticky.',
     enterSalePriceHint: 'Zadejte prodejní cenu pro zobrazení výpočtu.',
+    enterCostHint: 'Zadejte cenu květin a/nebo obalu výše pro zahrnutí nákladů do výpočtu.',
     flowerCost: 'Cena květin (Kč)',
     wrapCost: 'Cena obalu/balení (Kč)',
     salePrice: 'Prodejní cena (Kč, vč. DPH)',

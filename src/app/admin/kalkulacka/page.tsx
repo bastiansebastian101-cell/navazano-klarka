@@ -34,6 +34,7 @@ export default function ProfitCalculatorPage() {
     bolt: '',
   });
 
+  const hasCost = flowerCostInput.trim() !== '' || wrapCostInput.trim() !== '';
   const flowerCost = toNumber(flowerCostInput);
   const wrapCost = toNumber(wrapCostInput);
   const totalCost = flowerCost + wrapCost;
@@ -67,6 +68,8 @@ export default function ProfitCalculatorPage() {
           />
         </div>
       </div>
+
+      {!hasCost && <p className="text-xs text-brand mb-4">{t.admin.enterCostHint}</p>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {CHANNELS.map((channel) => {
@@ -110,14 +113,14 @@ export default function ProfitCalculatorPage() {
                 </div>
                 <div>
                   <p>{t.admin.costLabel}</p>
-                  <p className="text-right font-medium text-ink">−{formatExact(totalCost)}</p>
+                  <p className="text-right font-medium text-ink">{hasCost ? `−${formatExact(totalCost)}` : '—'}</p>
                 </div>
               </div>
 
               <div className="mt-3 pt-3 border-t border-ink-lighter/20">
                 <p className="font-medium text-ink">{t.admin.profitLabel}</p>
                 <p className={`text-right text-lg font-semibold ${profit < 0 ? 'text-red-600' : 'text-sage-dark'}`}>
-                  {hasSalePrice ? formatExact(profit) : `−${formatExact(totalCost)}`}
+                  {hasSalePrice || hasCost ? formatExact(profit) : '—'}
                 </p>
               </div>
             </div>
