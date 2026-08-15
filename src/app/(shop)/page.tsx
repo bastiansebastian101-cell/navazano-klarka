@@ -11,6 +11,7 @@ export default async function HomePage() {
       where: { active: true, featuredOnHome: true },
       orderBy: { createdAt: 'desc' },
       take: 12,
+      include: { variants: { where: { active: true }, orderBy: { sortOrder: 'asc' } } },
     }),
     prisma.review.findMany({ orderBy: { createdAt: 'desc' }, take: 20 }),
   ]);

@@ -14,7 +14,7 @@ interface OrderRequestBody {
   notes?: string;
   couponCode?: string;
   occasionReason?: string;
-  items: { productId: string; quantity: number }[];
+  items: { productId: string; variantId?: string | null; quantity: number }[];
 }
 
 export async function POST(request: NextRequest) {
@@ -42,19 +42,38 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'invalid_delivery_date' }, { status: 400 });
     }
 
-    // Never trust client-submitted prices — look products up fresh and price
-    // the order server-side from what's actually active in the catalog.
+    // Never trust client-submitted prices — look products (and any selected
+    // variant) up fresh and price the order server-side from what's actually
+    // active in the catalog.
     const productIds = body.items.map((i) => i.productId);
-    const products = await prisma.product.findMany({ where: { id: { in: productIds }, active: true } });
+    const products = await prisma.product.findMany({
+      where: { id: { in: productIds }, active: true },
+      include: { variants: true },
+    });
     const productMap = new Map(products.map((p) => [p.id, p]));
 
-    const orderItems: { productId: string; quantity: number; priceCzk: number }[] = [];
+    const orderItems: { productId: string; variantId: string | null; variantLabel: string | null; quantity: number; priceCzk: number }[] = [];
     for (const item of body.items) {
       const product = productMap.get(item.productId);
       if (!product || !Number.isInteger(item.quantity) || item.quantity < 1) {
         return NextResponse.json({ error: 'invalid_item' }, { status: 400 });
       }
-      orderItems.push({ productId: product.id, quantity: item.quantity, priceCzk: product.priceCzk });
+
+      let priceCzk = product.priceCzk;
+      let variantId: string | null = null;
+      let variantLabel: string | null = null;
+
+      if (typeof item.variantId === 'string' && item.variantId) {
+        const variant = product.variants.find((v) => v.id === item.variantId && v.active);
+        if (!variant) {
+          return NextResponse.json({ error: 'invalid_item' }, { status: 400 });
+        }
+        priceCzk = variant.priceCzk;
+        variantId = variant.id;
+        variantLabel = variant.label;
+      }
+
+      orderItems.push({ productId: product.id, variantId, variantLabel, quantity: item.quantity, priceCzk });
     }
 
     const subtotalCzk = orderItems.reduce((sum, i) => sum + i.priceCzk * i.quantity, 0);
@@ -150,7 +169,12 @@ export async function POST(request: NextRequest) {
       subtotalCzk,
       discountCzk: order.discountCzk,
       totalCzk: order.totalCzk,
-      items: order.items.map((i) => ({ nameCs: i.product.nameCs, quantity: i.quantity, priceCzk: i.priceCzk })),
+      items: order.items.map((i) => ({
+        nameCs: i.product.nameCs,
+        variantLabel: i.variantLabel,
+        quantity: i.quantity,
+        priceCzk: i.priceCzk,
+      })),
     };
 
     await Promise.all([sendOrderConfirmationEmail(emailData), sendNewOrderAlertEmail(emailData)]);

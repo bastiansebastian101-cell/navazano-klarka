@@ -1,10 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import type { Product } from '@prisma/client';
+import type { Product, ProductVariant } from '@prisma/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const MAX_IMAGES = 3;
+
+type ProductWithVariants = Product & { variants: ProductVariant[] };
+
+interface VariantRow {
+  id?: string;
+  label: string;
+  priceCzk: string; // whole Kč, as typed — matches priceCzk input's own pattern
+}
 
 export function ProductFormModal({
   product,
@@ -12,7 +20,7 @@ export function ProductFormModal({
   onClose,
   onSaved,
 }: {
-  product: Product | null;
+  product: ProductWithVariants | null;
   existingCategories: string[];
   onClose: () => void;
   onSaved: () => void;
@@ -31,7 +39,24 @@ export function ProductFormModal({
   const [uploadingSlot, setUploadingSlot] = useState<number | null>(null);
   const [active, setActive] = useState(product?.active ?? true);
   const [featuredOnHome, setFeaturedOnHome] = useState(product?.featuredOnHome ?? false);
+  const [variants, setVariants] = useState<VariantRow[]>(
+    () =>
+      product?.variants.map((v) => ({ id: v.id, label: v.label, priceCzk: String(Math.round(v.priceCzk / 100)) })) ??
+      []
+  );
   const [saving, setSaving] = useState(false);
+
+  const handleAddVariant = () => {
+    setVariants((prev) => [...prev, { label: '', priceCzk: '' }]);
+  };
+
+  const handleRemoveVariant = (index: number) => {
+    setVariants((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleVariantChange = (index: number, field: 'label' | 'priceCzk', value: string) => {
+    setVariants((prev) => prev.map((v, i) => (i === index ? { ...v, [field]: value } : v)));
+  };
 
   const handleUpload = async (slotIndex: number, file: File) => {
     setUploadingSlot(slotIndex);
@@ -61,6 +86,9 @@ export function ProductFormModal({
       imageUrls: imageSlots.filter((url): url is string => url !== null),
       active,
       featuredOnHome,
+      variants: variants
+        .filter((v) => v.label.trim() !== '' && v.priceCzk.trim() !== '')
+        .map((v) => ({ id: v.id, label: v.label.trim(), priceCzk: Math.round((parseFloat(v.priceCzk) || 0) * 100) })),
     };
 
     if (product) {
@@ -186,6 +214,46 @@ export function ProductFormModal({
                 </div>
               ))}
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm text-ink-light mb-2">{t.admin.variants}</label>
+            <p className="text-xs text-ink-lighter mb-2">{t.admin.variantsHint}</p>
+            <div className="space-y-2">
+              {variants.map((v, i) => (
+                <div key={i} className="flex gap-2 items-center">
+                  <input
+                    placeholder={t.admin.variantLabelPlaceholder}
+                    value={v.label}
+                    onChange={(e) => handleVariantChange(i, 'label', e.target.value)}
+                    className="flex-1 min-w-0 border border-ink-lighter/30 rounded-lg px-3 py-2 text-sm"
+                  />
+                  <input
+                    type="number"
+                    min={0}
+                    placeholder={t.admin.priceCzk}
+                    value={v.priceCzk}
+                    onChange={(e) => handleVariantChange(i, 'priceCzk', e.target.value)}
+                    className="w-24 border border-ink-lighter/30 rounded-lg px-3 py-2 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveVariant(i)}
+                    className="text-ink-lighter hover:text-red-600 text-lg leading-none px-1"
+                    aria-label={t.admin.removeVariant}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={handleAddVariant}
+              className="mt-2 text-sm text-brand hover:text-brand-hover font-medium"
+            >
+              + {t.admin.addVariant}
+            </button>
           </div>
 
           <label className="flex items-center gap-2 text-sm text-ink">

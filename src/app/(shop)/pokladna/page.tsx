@@ -115,7 +115,7 @@ export default function CheckoutPage() {
           notes,
           occasionReason,
           couponCode: appliedCoupon?.code,
-          items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
+          items: items.map((i) => ({ productId: i.productId, variantId: i.variantId, quantity: i.quantity })),
         }),
       });
 
@@ -257,9 +257,10 @@ export default function CheckoutPage() {
         <h2 className="font-medium text-ink mb-4">{t.checkout.orderSummary}</h2>
         <div className="space-y-2 text-sm">
           {items.map((item) => (
-            <div key={item.productId} className="flex justify-between">
+            <div key={`${item.productId}:${item.variantId ?? ''}`} className="flex justify-between">
               <span className="text-ink-light">
-                {item.nameCs} × {item.quantity}
+                {item.nameCs}
+                {item.variantLabel && ` (${item.variantLabel})`} × {item.quantity}
               </span>
               <span className="text-ink">{formatCzk(item.priceCzk * item.quantity)}</span>
             </div>

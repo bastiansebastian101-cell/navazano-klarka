@@ -1,18 +1,23 @@
 'use client';
 
 import Link from 'next/link';
-import type { Product } from '@prisma/client';
+import type { Product, ProductVariant } from '@prisma/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { formatCzk } from '@/lib/format';
 import { ImageGallery } from '@/components/shop/ImageGallery';
 import { ShareButton } from '@/components/shop/ShareButton';
 
-export function ProductCard({ product }: { product: Product }) {
+type ProductWithVariants = Product & { variants: ProductVariant[] };
+
+export function ProductCard({ product }: { product: ProductWithVariants }) {
   const { language, t } = useLanguage();
   const { addItem } = useCart();
 
   const name = language === 'cs' ? product.nameCs : product.nameEn;
+  const activeVariants = product.variants.filter((v) => v.active);
+  const hasVariants = activeVariants.length > 0;
+  const fromPriceCzk = hasVariants ? Math.min(...activeVariants.map((v) => v.priceCzk)) : product.priceCzk;
 
   return (
     <div className="group rounded-3xl bg-white shadow-card hover:shadow-card-hover transition-shadow overflow-hidden">
@@ -32,21 +37,34 @@ export function ProductCard({ product }: { product: Product }) {
         <Link href={`/produkt/${product.id}`}>
           <h3 className="font-display text-lg text-ink hover:text-brand transition-colors">{name}</h3>
         </Link>
-        <p className="mt-1 text-brand font-semibold">{formatCzk(product.priceCzk)}</p>
-        <button
-          onClick={() =>
-            addItem({
-              productId: product.id,
-              nameCs: product.nameCs,
-              nameEn: product.nameEn,
-              priceCzk: product.priceCzk,
-              imageUrl: product.imageUrls[0] ?? null,
-            })
-          }
-          className="mt-4 w-full bg-brand hover:bg-brand-hover text-white text-sm font-semibold py-2.5 rounded-full transition-colors"
-        >
-          {t.catalog.addToCart}
-        </button>
+        <p className="mt-1 text-brand font-semibold">
+          {hasVariants ? `${t.catalog.fromPrice} ${formatCzk(fromPriceCzk)}` : formatCzk(fromPriceCzk)}
+        </p>
+        {hasVariants ? (
+          <Link
+            href={`/produkt/${product.id}`}
+            className="mt-4 block w-full text-center bg-brand hover:bg-brand-hover text-white text-sm font-semibold py-2.5 rounded-full transition-colors"
+          >
+            {t.catalog.chooseVariant}
+          </Link>
+        ) : (
+          <button
+            onClick={() =>
+              addItem({
+                productId: product.id,
+                variantId: null,
+                variantLabel: null,
+                nameCs: product.nameCs,
+                nameEn: product.nameEn,
+                priceCzk: product.priceCzk,
+                imageUrl: product.imageUrls[0] ?? null,
+              })
+            }
+            className="mt-4 w-full bg-brand hover:bg-brand-hover text-white text-sm font-semibold py-2.5 rounded-full transition-colors"
+          >
+            {t.catalog.addToCart}
+          </button>
+        )}
       </div>
     </div>
   );

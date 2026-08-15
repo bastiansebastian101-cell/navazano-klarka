@@ -1,16 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { Product } from '@prisma/client';
+import type { Product, ProductVariant } from '@prisma/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatCzk } from '@/lib/format';
 import { ProductFormModal } from '@/components/admin/ProductFormModal';
 
+type ProductWithVariants = Product & { variants: ProductVariant[] };
+
 export default function AdminProductsPage() {
   const { t } = useLanguage();
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductWithVariants[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<Product | 'new' | null>(null);
+  const [editing, setEditing] = useState<ProductWithVariants | 'new' | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
   const load = async () => {
@@ -93,6 +95,11 @@ export default function AdminProductsPage() {
                 <p className="text-sm text-brand font-semibold">{formatCzk(product.priceCzk)}</p>
                 {!product.active && <p className="text-xs text-red-500">{t.admin.couponInactiveLabel}</p>}
                 {product.featuredOnHome && <p className="text-xs text-sage-dark">{t.admin.onHomeLabel}</p>}
+                {product.variants.length > 0 && (
+                  <p className="text-xs text-ink-lighter">
+                    {product.variants.length} {t.admin.variantsCountLabel}
+                  </p>
+                )}
               </div>
               <button
                 onClick={() => handleToggleFeatured(product.id, product.featuredOnHome)}

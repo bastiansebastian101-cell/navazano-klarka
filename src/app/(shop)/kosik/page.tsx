@@ -31,8 +31,9 @@ export default function CartPage() {
       <div className="space-y-4">
         {items.map((item) => {
           const name = language === 'cs' ? item.nameCs : item.nameEn;
+          const lineKey = `${item.productId}:${item.variantId ?? ''}`;
           return (
-            <div key={item.productId} className="flex items-center gap-4 bg-white rounded-xl shadow-card p-4">
+            <div key={lineKey} className="flex items-center gap-4 bg-white rounded-xl shadow-card p-4">
               <div className="w-20 h-20 bg-sage-light rounded-lg overflow-hidden relative flex-shrink-0">
                 {item.imageUrl ? (
                   <Image src={item.imageUrl} alt={name} fill className="object-cover" />
@@ -41,23 +42,26 @@ export default function CartPage() {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-ink truncate">{name}</p>
+                <p className="font-medium text-ink truncate">
+                  {name}
+                  {item.variantLabel && <span className="text-ink-light font-normal"> — {item.variantLabel}</span>}
+                </p>
                 <p className="text-brand font-semibold">{formatCzk(item.priceCzk)}</p>
               </div>
               <div className="flex items-center gap-2">
-                <label htmlFor={`qty-${item.productId}`} className="sr-only">
+                <label htmlFor={`qty-${lineKey}`} className="sr-only">
                   {t.cart.quantity}
                 </label>
                 <input
-                  id={`qty-${item.productId}`}
+                  id={`qty-${lineKey}`}
                   type="number"
                   min={1}
                   value={item.quantity}
-                  onChange={(e) => setQuantity(item.productId, parseInt(e.target.value, 10) || 1)}
+                  onChange={(e) => setQuantity(item.productId, item.variantId, parseInt(e.target.value, 10) || 1)}
                   className="w-16 border border-ink-lighter/30 rounded-lg px-2 py-1.5 text-center"
                 />
                 <button
-                  onClick={() => removeItem(item.productId)}
+                  onClick={() => removeItem(item.productId, item.variantId)}
                   className="text-sm text-ink-light hover:text-brand"
                 >
                   {t.cart.remove}

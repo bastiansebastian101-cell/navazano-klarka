@@ -35,7 +35,8 @@ export function OrderConfirmation({
           {order.items.map((item) => (
             <div key={item.id} className="flex justify-between">
               <span className="text-ink-light">
-                {(language === 'cs' ? item.product.nameCs : item.product.nameEn)} × {item.quantity}
+                {(language === 'cs' ? item.product.nameCs : item.product.nameEn)}
+                {item.variantLabel && ` (${item.variantLabel})`} × {item.quantity}
               </span>
               <span className="text-ink">{formatCzk(item.priceCzk * item.quantity)}</span>
             </div>

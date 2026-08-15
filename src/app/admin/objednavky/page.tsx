@@ -92,7 +92,8 @@ export default function AdminOrdersPage() {
               <div className="mt-3 text-sm text-ink-light">
                 {order.items.map((item) => (
                   <span key={item.id} className="mr-3">
-                    {item.product.nameCs} × {item.quantity}
+                    {item.product.nameCs}
+                    {item.variantLabel && ` (${item.variantLabel})`} × {item.quantity}
                   </span>
                 ))}
               </div>

@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import type { Product } from '@prisma/client';
+import type { Product, ProductVariant } from '@prisma/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ProductCard } from '@/components/shop/ProductCard';
 
-export function CatalogGrid({ products }: { products: Product[] }) {
+export function CatalogGrid({ products }: { products: (Product & { variants: ProductVariant[] })[] }) {
   const { t } = useLanguage();
   const [category, setCategory] = useState<string>('all');
   const categories = ['all', ...Array.from(new Set(products.map((p) => p.category))).sort()];

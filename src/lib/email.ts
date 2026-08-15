@@ -33,14 +33,14 @@ interface OrderEmailData {
   subtotalCzk?: number;
   discountCzk?: number;
   totalCzk: number;
-  items: { nameCs: string; quantity: number; priceCzk: number }[];
+  items: { nameCs: string; variantLabel?: string | null; quantity: number; priceCzk: number }[];
 }
 
 function itemsTable(items: OrderEmailData['items']): string {
   return items
     .map(
       (i) =>
-        `<tr><td style="padding:6px 0;color:#111;">${i.nameCs} × ${i.quantity}</td><td style="padding:6px 0;text-align:right;color:#111;">${formatCzk(i.priceCzk * i.quantity)}</td></tr>`
+        `<tr><td style="padding:6px 0;color:#111;">${i.nameCs}${i.variantLabel ? ` (${i.variantLabel})` : ''} × ${i.quantity}</td><td style="padding:6px 0;text-align:right;color:#111;">${formatCzk(i.priceCzk * i.quantity)}</td></tr>`
     )
     .join('');
 }

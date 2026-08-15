@@ -1,10 +1,10 @@
 'use client';
 
-import type { Product } from '@prisma/client';
+import type { Product, ProductVariant } from '@prisma/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ProductCard } from '@/components/shop/ProductCard';
 
-export function FeaturedSection({ products }: { products: Product[] }) {
+export function FeaturedSection({ products }: { products: (Product & { variants: ProductVariant[] })[] }) {
   const { t } = useLanguage();
 
   return (
