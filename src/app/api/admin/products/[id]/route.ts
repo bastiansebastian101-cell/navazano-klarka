@@ -17,6 +17,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     data.imageUrls = body.imageUrls.slice(0, 3);
   }
   if (typeof body.active === 'boolean') data.active = body.active;
+  if (typeof body.featuredOnHome === 'boolean') data.featuredOnHome = body.featuredOnHome;
 
   const product = await prisma.product.update({ where: { id: params.id }, data });
   return NextResponse.json({ product });

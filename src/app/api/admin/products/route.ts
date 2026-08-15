@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
       category: typeof body.category === 'string' && body.category.trim() ? body.category.trim() : 'bouquet',
       imageUrls,
       active: body.active ?? true,
+      featuredOnHome: body.featuredOnHome ?? false,
     },
   });
 

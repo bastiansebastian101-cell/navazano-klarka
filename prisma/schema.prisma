@@ -18,6 +18,7 @@ model Product {
   category      String // "bouquet" | "plant" | "gift"
   imageUrls     String[] @default([]) // up to 3 photos
   active        Boolean  @default(true)
+  featuredOnHome Boolean @default(false) // admin-controlled: shown on homepage featured section instead of only the 3 newest
   createdAt     DateTime @default(now())
 
   orderItems OrderItem[]

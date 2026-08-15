@@ -42,6 +42,15 @@ export default function AdminProductsPage() {
     load();
   };
 
+  const handleToggleFeatured = async (id: string, current: boolean) => {
+    await fetch(`/api/admin/products/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ featuredOnHome: !current }),
+    });
+    load();
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -83,7 +92,15 @@ export default function AdminProductsPage() {
                 </p>
                 <p className="text-sm text-brand font-semibold">{formatCzk(product.priceCzk)}</p>
                 {!product.active && <p className="text-xs text-red-500">{t.admin.couponInactiveLabel}</p>}
+                {product.featuredOnHome && <p className="text-xs text-sage-dark">{t.admin.onHomeLabel}</p>}
               </div>
+              <button
+                onClick={() => handleToggleFeatured(product.id, product.featuredOnHome)}
+                title={product.featuredOnHome ? t.admin.removeFromHome : t.admin.moveToHome}
+                className={`text-xl leading-none ${product.featuredOnHome ? 'text-brand' : 'text-ink-lighter hover:text-brand'}`}
+              >
+                {product.featuredOnHome ? '★' : '☆'}
+              </button>
               <button onClick={() => setEditing(product)} className="text-sm text-brand hover:text-brand-hover">
                 {t.admin.edit}
               </button>

@@ -8,9 +8,9 @@ export const dynamic = 'force-dynamic';
 export default async function HomePage() {
   const [featured, reviews] = await Promise.all([
     prisma.product.findMany({
-      where: { active: true },
+      where: { active: true, featuredOnHome: true },
       orderBy: { createdAt: 'desc' },
-      take: 3,
+      take: 12,
     }),
     prisma.review.findMany({ orderBy: { createdAt: 'desc' }, take: 20 }),
   ]);

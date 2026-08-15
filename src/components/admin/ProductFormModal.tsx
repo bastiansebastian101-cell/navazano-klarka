@@ -30,6 +30,7 @@ export function ProductFormModal({
   });
   const [uploadingSlot, setUploadingSlot] = useState<number | null>(null);
   const [active, setActive] = useState(product?.active ?? true);
+  const [featuredOnHome, setFeaturedOnHome] = useState(product?.featuredOnHome ?? false);
   const [saving, setSaving] = useState(false);
 
   const handleUpload = async (slotIndex: number, file: File) => {
@@ -59,6 +60,7 @@ export function ProductFormModal({
       category,
       imageUrls: imageSlots.filter((url): url is string => url !== null),
       active,
+      featuredOnHome,
     };
 
     if (product) {
@@ -189,6 +191,14 @@ export function ProductFormModal({
           <label className="flex items-center gap-2 text-sm text-ink">
             <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />
             {t.admin.active}
+          </label>
+          <label className="flex items-center gap-2 text-sm text-ink">
+            <input
+              type="checkbox"
+              checked={featuredOnHome}
+              onChange={(e) => setFeaturedOnHome(e.target.checked)}
+            />
+            {t.admin.featuredOnHome}
           </label>
         </div>
 
