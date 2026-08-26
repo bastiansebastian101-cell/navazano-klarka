@@ -57,12 +57,20 @@ export default function AdminProductsPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-display text-2xl text-ink">{t.admin.products}</h1>
-        <button
-          onClick={() => setEditing('new')}
-          className="bg-brand hover:bg-brand-hover text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-colors"
-        >
-          {t.admin.addProduct}
-        </button>
+        <div className="flex items-center gap-3">
+          <a
+            href="/api/admin/products/export"
+            className="border border-brand text-brand hover:bg-brand-light text-sm font-semibold px-5 py-2.5 rounded-full transition-colors"
+          >
+            {t.admin.downloadCatalog}
+          </a>
+          <button
+            onClick={() => setEditing('new')}
+            className="bg-brand hover:bg-brand-hover text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-colors"
+          >
+            {t.admin.addProduct}
+          </button>
+        </div>
       </div>
 
       {notice && (

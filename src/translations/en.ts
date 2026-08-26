@@ -96,6 +96,7 @@ export const en: Translations = {
     products: 'Products',
     orders: 'Orders',
     addProduct: 'Add product',
+    downloadCatalog: 'Download catalog (Excel)',
     editProduct: 'Edit product',
     logout: 'Log out',
     nameCs: 'Name (Czech)',

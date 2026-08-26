@@ -94,6 +94,7 @@ export const cs = {
     products: 'Produkty',
     orders: 'Objednávky',
     addProduct: 'Přidat produkt',
+    downloadCatalog: 'Stáhnout katalog (Excel)',
     editProduct: 'Upravit produkt',
     logout: 'Odhlásit se',
     nameCs: 'Název (česky)',
