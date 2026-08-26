@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
 
   const rows = products.map((p) => ({
     'Název (CS)': p.nameCs,
+    Foto: p.imageUrls[0] ?? '',
     'Name (EN)': p.nameEn,
     Kategorie: p.category,
     'Cena (Kč)': p.priceCzk / 100,
@@ -25,6 +26,7 @@ export async function GET(request: NextRequest) {
   const worksheet = XLSX.utils.json_to_sheet(rows);
   worksheet['!cols'] = [
     { wch: 30 }, // Název (CS)
+    { wch: 40 }, // Foto
     { wch: 30 }, // Name (EN)
     { wch: 14 }, // Kategorie
     { wch: 10 }, // Cena
@@ -33,6 +35,15 @@ export async function GET(request: NextRequest) {
     { wch: 16 }, // Na hlavní stránce
     { wch: 12 }, // Vytvořeno
   ];
+
+  // Make the Foto column (column B) a clickable hyperlink to the actual photo
+  products.forEach((p, i) => {
+    const url = p.imageUrls[0];
+    if (!url) return;
+    const cellRef = XLSX.utils.encode_cell({ r: i + 1, c: 1 });
+    const cell = worksheet[cellRef];
+    if (cell) cell.l = { Target: url };
+  });
 
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Katalog');
