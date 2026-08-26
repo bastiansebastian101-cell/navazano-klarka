@@ -6,7 +6,11 @@ import { requireAdmin } from '@/lib/requireAdmin';
 export async function GET(request: NextRequest) {
   if (!requireAdmin(request)) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
 
+  const idsParam = request.nextUrl.searchParams.get('ids');
+  const ids = idsParam ? idsParam.split(',').filter(Boolean) : null;
+
   const products = await prisma.product.findMany({
+    where: ids ? { id: { in: ids } } : undefined,
     orderBy: { createdAt: 'desc' },
     include: { variants: { orderBy: { sortOrder: 'asc' } } },
   });
@@ -15,6 +19,8 @@ export async function GET(request: NextRequest) {
     'Název (CS)': p.nameCs,
     Foto: p.imageUrls[0] ?? '',
     'Name (EN)': p.nameEn,
+    'Popis (CS)': p.descriptionCs,
+    'Description (EN)': p.descriptionEn,
     Kategorie: p.category,
     'Cena (Kč)': p.priceCzk / 100,
     Varianty: p.variants.map((v) => `${v.label}: ${(v.priceCzk / 100).toFixed(0)} Kč`).join(', '),
@@ -28,6 +34,8 @@ export async function GET(request: NextRequest) {
     { wch: 30 }, // Název (CS)
     { wch: 40 }, // Foto
     { wch: 30 }, // Name (EN)
+    { wch: 50 }, // Popis (CS)
+    { wch: 50 }, // Description (EN)
     { wch: 14 }, // Kategorie
     { wch: 10 }, // Cena
     { wch: 40 }, // Varianty

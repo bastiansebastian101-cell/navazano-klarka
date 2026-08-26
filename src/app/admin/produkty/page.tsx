@@ -14,6 +14,7 @@ export default function AdminProductsPage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<ProductWithVariants | 'new' | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const load = async () => {
     setLoading(true);
@@ -53,16 +54,30 @@ export default function AdminProductsPage() {
     load();
   };
 
+  const toggleSelected = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const exportHref =
+    selectedIds.size > 0
+      ? `/api/admin/products/export?ids=${Array.from(selectedIds).join(',')}`
+      : '/api/admin/products/export';
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-display text-2xl text-ink">{t.admin.products}</h1>
         <div className="flex items-center gap-3">
           <a
-            href="/api/admin/products/export"
+            href={exportHref}
             className="border border-brand text-brand hover:bg-brand-light text-sm font-semibold px-5 py-2.5 rounded-full transition-colors"
           >
-            {t.admin.downloadCatalog}
+            {selectedIds.size > 0 ? `${t.admin.downloadSelected} (${selectedIds.size})` : t.admin.downloadCatalog}
           </a>
           <button
             onClick={() => setEditing('new')}
@@ -88,6 +103,13 @@ export default function AdminProductsPage() {
         <div className="space-y-3">
           {products.map((product) => (
             <div key={product.id} className="flex items-center gap-4 bg-white rounded-xl shadow-card p-4">
+              <input
+                type="checkbox"
+                checked={selectedIds.has(product.id)}
+                onChange={() => toggleSelected(product.id)}
+                className="w-4 h-4 flex-shrink-0 accent-brand"
+                aria-label={product.nameCs}
+              />
               <div className="w-16 h-16 bg-sage-light rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center text-2xl">
                 {product.imageUrls[0] ? (
                   // eslint-disable-next-line @next/next/no-img-element
