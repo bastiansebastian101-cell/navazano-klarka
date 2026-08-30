@@ -26,8 +26,8 @@ const nextConfig = {
       // resolves against navazano.cz instead of the real app — an infinite
       // loop. Nested paths don't have this issue, so redirect straight to
       // one instead of ever proxying the bare root.
-      { source: '/stock', destination: '/stock/builder', permanent: false },
-      { source: '/stock/', destination: '/stock/builder', permanent: false },
+      { source: '/stock', destination: '/stock/dashboard', permanent: false },
+      { source: '/stock/', destination: '/stock/dashboard', permanent: false },
     ];
   },
   async rewrites() {
