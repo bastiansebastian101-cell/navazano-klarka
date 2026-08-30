@@ -18,6 +18,18 @@ const nextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      // Proxies the separate bouquet-stock app (its own repo/Vercel project)
+      // under navazano.cz/stock. That app is configured with basePath: '/stock'
+      // so its own routes/assets already live at this same prefix — see
+      // project_bouquet_stock_calculator memory for the full setup.
+      {
+        source: '/stock/:path*',
+        destination: 'https://bouquet-stock.vercel.app/stock/:path*',
+      },
+    ];
+  },
   images: {
     remotePatterns: [{ hostname: '*.public.blob.vercel-storage.com' }],
   },
