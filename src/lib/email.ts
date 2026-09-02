@@ -208,6 +208,66 @@ export async function sendCustomRequestEmail(data: CustomRequestEmailData): Prom
   return anySucceeded;
 }
 
+interface OfficeSubscriptionInquiryEmailData {
+  companyName: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  deliveryAddress: string;
+  planNameCs: string;
+  commitment: string; // "monthly" | "yearly"
+  priceCzk: number; // haléře, resolved monthly amount
+  message?: string | null;
+}
+
+export async function sendOfficeSubscriptionInquiryEmail(data: OfficeSubscriptionInquiryEmailData): Promise<boolean> {
+  const resend = getResend();
+  const notifyEmails = process.env.KLARKA_NOTIFY_EMAIL?.split(',').map((e) => e.trim()).filter(Boolean);
+  if (!resend || !notifyEmails?.length) return false;
+
+  const companyName = escapeHtml(data.companyName);
+  const contactName = escapeHtml(data.contactName);
+  const phone = escapeHtml(data.phone);
+  const deliveryAddress = escapeHtml(data.deliveryAddress);
+  const commitmentLabel = data.commitment === 'yearly' ? 'Ročně (měsíční platby)' : 'Měsíčně';
+
+  const messageBlock = data.message
+    ? `<div style="margin-top:16px;padding:16px;background:#FBEEF1;border-radius:8px;"><p style="margin:0;color:#111;font-size:14px;white-space:pre-wrap;">${escapeHtml(data.message)}</p></div>`
+    : '';
+
+  const html = `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;">
+        <h2 style="color:#111;margin-bottom:4px;">Nová poptávka — kancelářské předplatné</h2>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:12px;">
+          <tr><td style="padding:8px 0;color:#555;width:140px;">Firma</td><td style="padding:8px 0;font-weight:600;color:#111;">${companyName}</td></tr>
+          <tr><td style="padding:8px 0;color:#555;">Kontaktní osoba</td><td style="padding:8px 0;color:#111;">${contactName}</td></tr>
+          <tr><td style="padding:8px 0;color:#555;">E-mail</td><td style="padding:8px 0;"><a href="mailto:${data.email}" style="color:#B8567A;">${data.email}</a></td></tr>
+          <tr><td style="padding:8px 0;color:#555;">Telefon</td><td style="padding:8px 0;"><a href="tel:${phone}" style="color:#B8567A;">${phone}</a></td></tr>
+          <tr><td style="padding:8px 0;color:#555;">Adresa doručení</td><td style="padding:8px 0;color:#111;">${deliveryAddress}</td></tr>
+          <tr><td style="padding:8px 0;color:#555;">Tarif</td><td style="padding:8px 0;font-weight:600;color:#111;">${data.planNameCs}</td></tr>
+          <tr><td style="padding:8px 0;color:#555;">Fakturace</td><td style="padding:8px 0;color:#111;">${commitmentLabel}</td></tr>
+          <tr><td style="padding:8px 0;color:#555;">Cena měsíčně</td><td style="padding:8px 0;font-weight:600;color:#B8567A;">${formatCzk(data.priceCzk)}</td></tr>
+        </table>
+        ${messageBlock}
+      </div>
+    `;
+  const subject = `Nová poptávka — kancelářské předplatné (${data.planNameCs}) od ${data.companyName}`;
+
+  const results = await Promise.all(
+    notifyEmails.map((to) => resend.emails.send({ from: FROM, to, subject, html }))
+  );
+
+  let anySucceeded = false;
+  results.forEach(({ error }, i) => {
+    if (error) {
+      console.error('sendOfficeSubscriptionInquiryEmail failed:', notifyEmails[i], error);
+    } else {
+      anySucceeded = true;
+    }
+  });
+  return anySucceeded;
+}
+
 export async function sendLoginLinkEmail(email: string, loginUrl: string): Promise<boolean> {
   const resend = getResend();
   if (!resend) return false;

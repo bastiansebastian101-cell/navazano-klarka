@@ -155,3 +155,38 @@ model OrderItem {
   quantity  Int
   priceCzk  Int // price at time of order (variant's price if one was selected, else product's base price)
 }
+
+model OfficeSubscriptionPlan {
+  id                       String   @id @default(cuid())
+  tier                     String   @unique // "classic" | "standard" | "luxury"
+  nameCs                   String
+  nameEn                   String
+  descriptionCs            String
+  descriptionEn            String
+  priceMonthlyCzk          Int      // haléře — no-commitment monthly rate
+  priceYearlyCommitmentCzk Int      // haléře — PER-MONTH rate under a 12-month commitment; still
+                                     // billed monthly, this is a discounted monthly figure, never a
+                                     // lump annual charge
+  sortOrder                Int      @default(0)
+  active                   Boolean  @default(true)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+}
+
+model OfficeSubscriptionInquiry {
+  id              String    @id @default(cuid())
+  companyName     String
+  contactName     String
+  email           String
+  phone           String
+  deliveryAddress String
+  planTier        String    // "classic" | "standard" | "luxury" — snapshot, not a hard FK, so this
+                              // stays readable even if the plan row is later edited
+  commitment      String    // "monthly" | "yearly" — billing is monthly either way; this only
+                              // affects which rate applies (see priceCzk)
+  priceCzk        Int       // haléře — resolved monthly amount to collect, snapshotted server-side
+                              // from the plan row at submission time, never trusted from the client
+  message         String?
+  contactedAt     DateTime? // state inferred from this being set, same as CustomRequest.deliveredAt
+  createdAt       DateTime  @default(now())
+}

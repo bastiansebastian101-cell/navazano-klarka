@@ -51,6 +51,7 @@ export function Header() {
         <nav className="hidden md:flex items-center gap-6 mx-auto">
           {navLink('/', t.nav.home)}
           {navLink('/katalog', t.nav.catalog)}
+          {navLink('/kancelare', t.nav.officeSubscriptions)}
           {navLink('/o-nas', t.nav.about)}
         </nav>
 
@@ -77,6 +78,7 @@ export function Header() {
         <nav className="md:hidden border-t border-ink-lighter/20 bg-cream px-4 py-4 flex flex-col gap-4">
           {navLink('/', t.nav.home, () => setMenuOpen(false))}
           {navLink('/katalog', t.nav.catalog, () => setMenuOpen(false))}
+          {navLink('/kancelare', t.nav.officeSubscriptions, () => setMenuOpen(false))}
           {navLink('/o-nas', t.nav.about, () => setMenuOpen(false))}
           {navLink('/ucet', t.nav.account, () => setMenuOpen(false))}
         </nav>
