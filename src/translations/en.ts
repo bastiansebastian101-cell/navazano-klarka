@@ -131,6 +131,7 @@ export const en: Translations = {
     productDeletedNotice: 'Product deleted.',
     productDeactivatedNotice: "This product already has orders, so it couldn't be permanently deleted — it was hidden from the catalog (deactivated) instead. Its order history is preserved.",
     noProducts: 'No products yet.',
+    productSaveFailed: "Couldn't save the product. Make sure both names (Czech and English) and a valid price are filled in, then try again.",
     noOrders: 'No orders yet.',
     coupons: 'Coupons',
     addCoupon: 'Add coupon',

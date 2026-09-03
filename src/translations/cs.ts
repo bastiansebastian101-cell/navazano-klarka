@@ -129,6 +129,7 @@ export const cs = {
     productDeletedNotice: 'Produkt byl smazán.',
     productDeactivatedNotice: 'Tento produkt už má objednávky, takže nemohl být trvale smazán — byl místo toho skryt z katalogu (deaktivován). Objednávky s ním zůstávají zachované.',
     noProducts: 'Zatím nejsou žádné produkty.',
+    productSaveFailed: 'Produkt se nepodařilo uložit. Zkontrolujte, že jsou vyplněny oba názvy (česky i anglicky) a platná cena, a zkuste to znovu.',
     noOrders: 'Zatím nejsou žádné objednávky.',
     coupons: 'Kupóny',
     addCoupon: 'Přidat kupón',

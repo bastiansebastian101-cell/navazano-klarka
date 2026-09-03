@@ -45,6 +45,7 @@ export function ProductFormModal({
       []
   );
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const handleAddVariant = () => {
     setVariants((prev) => [...prev, { label: '', priceCzk: '' }]);
@@ -76,6 +77,7 @@ export function ProductFormModal({
 
   const handleSave = async () => {
     setSaving(true);
+    setSaveError(null);
     const body = {
       nameCs,
       nameEn,
@@ -91,21 +93,25 @@ export function ProductFormModal({
         .map((v) => ({ id: v.id, label: v.label.trim(), priceCzk: Math.round((parseFloat(v.priceCzk) || 0) * 100) })),
     };
 
-    if (product) {
-      await fetch(`/api/admin/products/${product.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-    } else {
-      await fetch('/api/admin/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-    }
+    const res = product
+      ? await fetch(`/api/admin/products/${product.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        })
+      : await fetch('/api/admin/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
 
     setSaving(false);
+
+    if (!res.ok) {
+      setSaveError(t.admin.productSaveFailed);
+      return;
+    }
+
     onSaved();
   };
 
@@ -269,6 +275,8 @@ export function ProductFormModal({
             {t.admin.featuredOnHome}
           </label>
         </div>
+
+        {saveError && <p className="mt-3 text-sm text-red-600">{saveError}</p>}
 
         <div className="flex gap-3 mt-6">
           <button
