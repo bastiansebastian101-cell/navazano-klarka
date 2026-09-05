@@ -6,7 +6,7 @@ export const cs = {
     home: 'Domů',
     account: 'Můj účet',
     about: 'O nás',
-    officeSubscriptions: 'Pro kanceláře',
+    officeSubscriptions: 'Květinové předplatné',
   },
   home: {
     heroTitle: 'Ručně vázané kytice s láskou',
@@ -251,7 +251,7 @@ export const cs = {
     close: 'Zavřít',
   },
   officeSubscription: {
-    title: 'Čerstvé květiny pro vaši kancelář',
+    title: 'Květinové předplatné',
     intro: 'Pravidelný přísun čerstvých květin do vázy, 6x měsíčně, přímo do vaší kanceláře nebo firmy.',
     deliveryPoint: 'Doručení 6x měsíčně',
     vasePoint: 'Pokaždé nová váza',

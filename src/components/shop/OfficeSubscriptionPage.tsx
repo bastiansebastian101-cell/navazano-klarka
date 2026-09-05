@@ -65,6 +65,16 @@ export function OfficeSubscriptionPage({ plans }: { plans: OfficeSubscriptionPla
             🚚 {t.officeSubscription.freeDeliveryPoint}
           </span>
         </div>
+
+        <video
+          className="mt-8 w-full max-w-lg mx-auto rounded-2xl bg-ink"
+          src="/videos/subscription-showcase.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          controls
+        />
       </div>
 
       <div className="mt-10 flex justify-center">

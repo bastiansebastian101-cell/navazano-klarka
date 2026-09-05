@@ -8,7 +8,7 @@ export const en: Translations = {
     home: 'Home',
     account: 'My account',
     about: 'About us',
-    officeSubscriptions: 'For offices',
+    officeSubscriptions: 'Flower subscription',
   },
   home: {
     heroTitle: 'Handmade bouquets, tied with love',
@@ -253,7 +253,7 @@ export const en: Translations = {
     close: 'Close',
   },
   officeSubscription: {
-    title: 'Fresh flowers for your office',
+    title: 'Flower subscription',
     intro: 'A regular supply of fresh flowers in a vase, 6 times a month, delivered straight to your office or business.',
     deliveryPoint: 'Delivered 6 times a month',
     vasePoint: 'A fresh vase every time',
