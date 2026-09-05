@@ -246,8 +246,8 @@ export const cs = {
   },
   officeSubscription: {
     title: 'Čerstvé květiny pro vaši kancelář',
-    intro: 'Pravidelný přísun čerstvých květin do vázy, dvakrát týdně, přímo do vaší kanceláře nebo firmy.',
-    deliveryPoint: 'Doručení dvakrát týdně',
+    intro: 'Pravidelný přísun čerstvých květin do vázy, 6x měsíčně, přímo do vaší kanceláře nebo firmy.',
+    deliveryPoint: 'Doručení 6x měsíčně',
     vasePoint: 'Pokaždé nová váza',
     monthly: 'Měsíčně',
     yearly: 'Roční smlouva',

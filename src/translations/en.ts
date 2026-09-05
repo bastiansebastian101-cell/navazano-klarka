@@ -248,8 +248,8 @@ export const en: Translations = {
   },
   officeSubscription: {
     title: 'Fresh flowers for your office',
-    intro: 'A regular supply of fresh flowers in a vase, twice a week, delivered straight to your office or business.',
-    deliveryPoint: 'Delivered twice a week',
+    intro: 'A regular supply of fresh flowers in a vase, 6 times a month, delivered straight to your office or business.',
+    deliveryPoint: 'Delivered 6 times a month',
     vasePoint: 'A fresh vase every time',
     monthly: 'Monthly',
     yearly: 'Yearly commitment',
