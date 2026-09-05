@@ -244,6 +244,12 @@ export const cs = {
     genericError: 'Něco se nepovedlo. Zkuste to prosím znovu.',
     cutoffError: 'Vybrané datum doručení už není možné — vyberte prosím pozdější termín.',
   },
+  videoPopup: {
+    title: 'Jaké to je mít květinové předplatné?',
+    subtitle: 'Podívejte se, jak vypadá doručení čerstvých květin přímo k vám.',
+    cta: 'Zobrazit nabídku předplatného',
+    close: 'Zavřít',
+  },
   officeSubscription: {
     title: 'Čerstvé květiny pro vaši kancelář',
     intro: 'Pravidelný přísun čerstvých květin do vázy, 6x měsíčně, přímo do vaší kanceláře nebo firmy.',

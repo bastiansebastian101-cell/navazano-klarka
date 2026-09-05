@@ -246,6 +246,12 @@ export const en: Translations = {
     genericError: 'Something went wrong. Please try again.',
     cutoffError: 'The selected delivery date is no longer available — please choose a later date.',
   },
+  videoPopup: {
+    title: 'What does a flower subscription feel like?',
+    subtitle: 'See what fresh flower delivery straight to you looks like.',
+    cta: 'See subscription plans',
+    close: 'Close',
+  },
   officeSubscription: {
     title: 'Fresh flowers for your office',
     intro: 'A regular supply of fresh flowers in a vase, 6 times a month, delivered straight to your office or business.',
