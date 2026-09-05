@@ -249,6 +249,7 @@ export const cs = {
     intro: 'Pravidelný přísun čerstvých květin do vázy, 6x měsíčně, přímo do vaší kanceláře nebo firmy.',
     deliveryPoint: 'Doručení 6x měsíčně',
     vasePoint: 'Pokaždé nová váza',
+    freeDeliveryPoint: 'Doprava zdarma',
     monthly: 'Měsíčně',
     yearly: 'Roční smlouva',
     perMonth: 'měsíc',

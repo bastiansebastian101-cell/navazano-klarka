@@ -61,6 +61,9 @@ export function OfficeSubscriptionPage({ plans }: { plans: OfficeSubscriptionPla
           <span className="inline-flex items-center gap-2 bg-sage-light rounded-full px-4 py-2">
             🏺 {t.officeSubscription.vasePoint}
           </span>
+          <span className="inline-flex items-center gap-2 bg-sage-light rounded-full px-4 py-2">
+            🚚 {t.officeSubscription.freeDeliveryPoint}
+          </span>
         </div>
       </div>
 

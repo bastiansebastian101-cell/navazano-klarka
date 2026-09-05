@@ -251,6 +251,7 @@ export const en: Translations = {
     intro: 'A regular supply of fresh flowers in a vase, 6 times a month, delivered straight to your office or business.',
     deliveryPoint: 'Delivered 6 times a month',
     vasePoint: 'A fresh vase every time',
+    freeDeliveryPoint: 'Free delivery',
     monthly: 'Monthly',
     yearly: 'Yearly commitment',
     perMonth: 'month',
