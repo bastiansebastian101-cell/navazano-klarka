@@ -215,8 +215,8 @@ interface OfficeSubscriptionInquiryEmailData {
   phone: string;
   deliveryAddress: string;
   planNameCs: string;
-  commitment: string; // "monthly" | "yearly"
-  priceCzk: number; // haléře, resolved monthly amount
+  duration: string; // "1month" | "2month"
+  priceCzk: number; // haléře, resolved total amount
   message?: string | null;
 }
 
@@ -229,7 +229,7 @@ export async function sendOfficeSubscriptionInquiryEmail(data: OfficeSubscriptio
   const contactName = escapeHtml(data.contactName);
   const phone = escapeHtml(data.phone);
   const deliveryAddress = escapeHtml(data.deliveryAddress);
-  const commitmentLabel = data.commitment === 'yearly' ? 'Ročně (měsíční platby)' : 'Měsíčně';
+  const durationLabel = data.duration === '2month' ? '2 měsíce' : '1 měsíc';
 
   const messageBlock = data.message
     ? `<div style="margin-top:16px;padding:16px;background:#FBEEF1;border-radius:8px;"><p style="margin:0;color:#111;font-size:14px;white-space:pre-wrap;">${escapeHtml(data.message)}</p></div>`
@@ -237,7 +237,7 @@ export async function sendOfficeSubscriptionInquiryEmail(data: OfficeSubscriptio
 
   const html = `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;">
-        <h2 style="color:#111;margin-bottom:4px;">Nová poptávka — kancelářské předplatné</h2>
+        <h2 style="color:#111;margin-bottom:4px;">Nová poptávka — květinové předplatné</h2>
         <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:12px;">
           <tr><td style="padding:8px 0;color:#555;width:140px;">Firma</td><td style="padding:8px 0;font-weight:600;color:#111;">${companyName}</td></tr>
           <tr><td style="padding:8px 0;color:#555;">Kontaktní osoba</td><td style="padding:8px 0;color:#111;">${contactName}</td></tr>
@@ -245,13 +245,13 @@ export async function sendOfficeSubscriptionInquiryEmail(data: OfficeSubscriptio
           <tr><td style="padding:8px 0;color:#555;">Telefon</td><td style="padding:8px 0;"><a href="tel:${phone}" style="color:#B8567A;">${phone}</a></td></tr>
           <tr><td style="padding:8px 0;color:#555;">Adresa doručení</td><td style="padding:8px 0;color:#111;">${deliveryAddress}</td></tr>
           <tr><td style="padding:8px 0;color:#555;">Tarif</td><td style="padding:8px 0;font-weight:600;color:#111;">${data.planNameCs}</td></tr>
-          <tr><td style="padding:8px 0;color:#555;">Fakturace</td><td style="padding:8px 0;color:#111;">${commitmentLabel}</td></tr>
-          <tr><td style="padding:8px 0;color:#555;">Cena měsíčně</td><td style="padding:8px 0;font-weight:600;color:#B8567A;">${formatCzk(data.priceCzk)}</td></tr>
+          <tr><td style="padding:8px 0;color:#555;">Délka</td><td style="padding:8px 0;color:#111;">${durationLabel}</td></tr>
+          <tr><td style="padding:8px 0;color:#555;">Celková cena</td><td style="padding:8px 0;font-weight:600;color:#B8567A;">${formatCzk(data.priceCzk)}</td></tr>
         </table>
         ${messageBlock}
       </div>
     `;
-  const subject = `Nová poptávka — kancelářské předplatné (${data.planNameCs}) od ${data.companyName}`;
+  const subject = `Nová poptávka — květinové předplatné (${data.planNameCs}) od ${data.companyName}`;
 
   const results = await Promise.all(
     notifyEmails.map((to) => resend.emails.send({ from: FROM, to, subject, html }))

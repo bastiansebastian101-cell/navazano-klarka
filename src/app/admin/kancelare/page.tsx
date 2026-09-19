@@ -5,7 +5,7 @@ import type { OfficeSubscriptionPlan, OfficeSubscriptionInquiry } from '@prisma/
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatCzk } from '@/lib/format';
 
-const COMMITMENT_LABELS_CS: Record<string, string> = { monthly: 'Měsíčně', yearly: 'Ročně (měsíční platby)' };
+const DURATION_LABELS_CS: Record<string, string> = { '1month': '1 měsíc', '2month': '2 měsíce' };
 
 export default function AdminOfficeSubscriptionsPage() {
   const { t } = useLanguage();
@@ -13,7 +13,7 @@ export default function AdminOfficeSubscriptionsPage() {
   const [inquiries, setInquiries] = useState<OfficeSubscriptionInquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ nameCs: '', nameEn: '', descriptionCs: '', descriptionEn: '', priceMonthlyCzk: '', priceYearlyCommitmentCzk: '' });
+  const [form, setForm] = useState({ nameCs: '', nameEn: '', descriptionCs: '', descriptionEn: '', price1MonthCzk: '', price2MonthCzk: '' });
   const [savingId, setSavingId] = useState<string | null>(null);
   const [contactingId, setContactingId] = useState<string | null>(null);
 
@@ -40,8 +40,8 @@ export default function AdminOfficeSubscriptionsPage() {
       nameEn: plan.nameEn,
       descriptionCs: plan.descriptionCs,
       descriptionEn: plan.descriptionEn,
-      priceMonthlyCzk: String(Math.round(plan.priceMonthlyCzk / 100)),
-      priceYearlyCommitmentCzk: String(Math.round(plan.priceYearlyCommitmentCzk / 100)),
+      price1MonthCzk: String(Math.round(plan.price1MonthCzk / 100)),
+      price2MonthCzk: String(Math.round(plan.price2MonthCzk / 100)),
     });
   };
 
@@ -55,8 +55,8 @@ export default function AdminOfficeSubscriptionsPage() {
         nameEn: form.nameEn,
         descriptionCs: form.descriptionCs,
         descriptionEn: form.descriptionEn,
-        priceMonthlyCzk: Math.round(Number(form.priceMonthlyCzk)) * 100,
-        priceYearlyCommitmentCzk: Math.round(Number(form.priceYearlyCommitmentCzk)) * 100,
+        price1MonthCzk: Math.round(Number(form.price1MonthCzk)) * 100,
+        price2MonthCzk: Math.round(Number(form.price2MonthCzk)) * 100,
       }),
     });
     setSavingId(null);
@@ -130,22 +130,22 @@ export default function AdminOfficeSubscriptionsPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-ink-light mb-1">{t.admin.priceMonthlyCzk}</label>
+                    <label className="block text-xs text-ink-light mb-1">{t.admin.price1MonthCzk}</label>
                     <input
                       type="number"
                       min="1"
-                      value={form.priceMonthlyCzk}
-                      onChange={(e) => setForm((f) => ({ ...f, priceMonthlyCzk: e.target.value }))}
+                      value={form.price1MonthCzk}
+                      onChange={(e) => setForm((f) => ({ ...f, price1MonthCzk: e.target.value }))}
                       className="w-full rounded-lg border border-ink-lighter/30 px-3 py-1.5 text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-ink-light mb-1">{t.admin.priceYearlyCommitmentCzk}</label>
+                    <label className="block text-xs text-ink-light mb-1">{t.admin.price2MonthCzk}</label>
                     <input
                       type="number"
                       min="1"
-                      value={form.priceYearlyCommitmentCzk}
-                      onChange={(e) => setForm((f) => ({ ...f, priceYearlyCommitmentCzk: e.target.value }))}
+                      value={form.price2MonthCzk}
+                      onChange={(e) => setForm((f) => ({ ...f, price2MonthCzk: e.target.value }))}
                       className="w-full rounded-lg border border-ink-lighter/30 px-3 py-1.5 text-sm"
                     />
                   </div>
@@ -169,7 +169,7 @@ export default function AdminOfficeSubscriptionsPage() {
                       {plan.nameCs} <span className="text-ink-lighter text-sm">/ {plan.nameEn}</span>
                     </p>
                     <p className="text-sm text-ink-light mt-0.5">
-                      {formatCzk(plan.priceMonthlyCzk)} {t.admin.perMonth} &middot; {formatCzk(plan.priceYearlyCommitmentCzk)} {t.admin.perMonthYearly}
+                      {formatCzk(plan.price1MonthCzk)} {t.admin.perOneMonth} &middot; {formatCzk(plan.price2MonthCzk)} {t.admin.perTwoMonths}
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
@@ -207,7 +207,7 @@ export default function AdminOfficeSubscriptionsPage() {
               </div>
               <p className="mt-1 text-sm text-ink-light">{inq.deliveryAddress}</p>
               <p className="mt-2 text-sm font-semibold text-ink">
-                {inq.planTier} &middot; {COMMITMENT_LABELS_CS[inq.commitment] ?? inq.commitment} &middot; {formatCzk(inq.priceCzk)} {t.admin.perMonth}
+                {inq.planTier} &middot; {DURATION_LABELS_CS[inq.duration] ?? inq.duration} &middot; {formatCzk(inq.priceCzk)}
               </p>
               {inq.message && <p className="mt-2 text-sm text-ink-light whitespace-pre-wrap">{inq.message}</p>}
               <p className="mt-2 text-xs text-ink-lighter">{new Date(inq.createdAt).toLocaleString('cs-CZ')}</p>

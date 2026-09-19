@@ -11,9 +11,9 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   if (typeof body.nameEn === 'string' && body.nameEn.trim()) data.nameEn = body.nameEn.trim();
   if (typeof body.descriptionCs === 'string' && body.descriptionCs.trim()) data.descriptionCs = body.descriptionCs.trim();
   if (typeof body.descriptionEn === 'string' && body.descriptionEn.trim()) data.descriptionEn = body.descriptionEn.trim();
-  if (Number.isInteger(body.priceMonthlyCzk) && body.priceMonthlyCzk > 0) data.priceMonthlyCzk = body.priceMonthlyCzk;
-  if (Number.isInteger(body.priceYearlyCommitmentCzk) && body.priceYearlyCommitmentCzk > 0) {
-    data.priceYearlyCommitmentCzk = body.priceYearlyCommitmentCzk;
+  if (Number.isInteger(body.price1MonthCzk) && body.price1MonthCzk > 0) data.price1MonthCzk = body.price1MonthCzk;
+  if (Number.isInteger(body.price2MonthCzk) && body.price2MonthCzk > 0) {
+    data.price2MonthCzk = body.price2MonthCzk;
   }
   if (typeof body.active === 'boolean') data.active = body.active;
 

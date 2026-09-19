@@ -5,11 +5,11 @@ import type { OfficeSubscriptionPlan } from '@prisma/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatCzk } from '@/lib/format';
 
-type Commitment = 'monthly' | 'yearly';
+type Duration = '1month' | '2month';
 
 export function OfficeSubscriptionPage({ plans }: { plans: OfficeSubscriptionPlan[] }) {
   const { language, t } = useLanguage();
-  const [commitment, setCommitment] = useState<Commitment>('monthly');
+  const [duration, setDuration] = useState<Duration>('1month');
   const [planTier, setPlanTier] = useState<string>(plans[0]?.tier ?? '');
 
   const [companyName, setCompanyName] = useState('');
@@ -35,7 +35,7 @@ export function OfficeSubscriptionPage({ plans }: { plans: OfficeSubscriptionPla
       const res = await fetch('/api/office-subscriptions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ companyName, contactName, email, phone, deliveryAddress, planTier, commitment, message }),
+        body: JSON.stringify({ companyName, contactName, email, phone, deliveryAddress, planTier, duration, message }),
       });
       if (!res.ok) {
         setError(t.officeSubscription.genericError);
@@ -80,29 +80,30 @@ export function OfficeSubscriptionPage({ plans }: { plans: OfficeSubscriptionPla
       <div className="mt-10 flex justify-center">
         <div className="inline-flex bg-sage-light rounded-full p-1">
           <button
-            onClick={() => setCommitment('monthly')}
+            onClick={() => setDuration('1month')}
             className={`text-sm font-medium px-4 py-2 rounded-full transition-colors ${
-              commitment === 'monthly' ? 'bg-white text-brand shadow-card' : 'text-ink-light'
+              duration === '1month' ? 'bg-white text-brand shadow-card' : 'text-ink-light'
             }`}
           >
-            {t.officeSubscription.monthly}
+            {t.officeSubscription.oneMonth}
           </button>
           <button
-            onClick={() => setCommitment('yearly')}
+            onClick={() => setDuration('2month')}
             className={`text-sm font-medium px-4 py-2 rounded-full transition-colors ${
-              commitment === 'yearly' ? 'bg-white text-brand shadow-card' : 'text-ink-light'
+              duration === '2month' ? 'bg-white text-brand shadow-card' : 'text-ink-light'
             }`}
           >
-            {t.officeSubscription.yearly}
+            {t.officeSubscription.twoMonths}
           </button>
         </div>
       </div>
 
-      <div className="mt-8 grid sm:grid-cols-3 gap-5">
+      <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {plans.map((plan) => {
           const name = language === 'cs' ? plan.nameCs : plan.nameEn;
           const description = language === 'cs' ? plan.descriptionCs : plan.descriptionEn;
-          const priceCzk = commitment === 'yearly' ? plan.priceYearlyCommitmentCzk : plan.priceMonthlyCzk;
+          const priceCzk = duration === '2month' ? plan.price2MonthCzk : plan.price1MonthCzk;
+          const durationLabel = duration === '2month' ? t.officeSubscription.perTwoMonths : t.officeSubscription.perOneMonth;
           const selected = planTier === plan.tier;
           return (
             <div
@@ -114,7 +115,7 @@ export function OfficeSubscriptionPage({ plans }: { plans: OfficeSubscriptionPla
               <h3 className="font-display text-xl text-ink">{name}</h3>
               <p className="mt-2 text-2xl font-semibold text-brand">
                 {formatCzk(priceCzk)}
-                <span className="text-sm font-normal text-ink-light"> / {t.officeSubscription.perMonth}</span>
+                <span className="text-sm font-normal text-ink-light"> / {durationLabel}</span>
               </p>
               <p className="mt-3 text-sm text-ink-light flex-1">{description}</p>
               <button

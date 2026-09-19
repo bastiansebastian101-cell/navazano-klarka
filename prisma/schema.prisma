@@ -157,20 +157,19 @@ model OrderItem {
 }
 
 model OfficeSubscriptionPlan {
-  id                       String   @id @default(cuid())
-  tier                     String   @unique // "classic" | "standard" | "luxury"
-  nameCs                   String
-  nameEn                   String
-  descriptionCs            String
-  descriptionEn            String
-  priceMonthlyCzk          Int      // haléře — no-commitment monthly rate
-  priceYearlyCommitmentCzk Int      // haléře — PER-MONTH rate under a 12-month commitment; still
-                                     // billed monthly, this is a discounted monthly figure, never a
-                                     // lump annual charge
-  sortOrder                Int      @default(0)
-  active                   Boolean  @default(true)
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
+  id             String   @id @default(cuid())
+  tier           String   @unique // "mini-vases" | "small-bouquet" | "medium-bouquet" | "premium-bouquet"
+  nameCs         String
+  nameEn         String
+  descriptionCs  String
+  descriptionEn  String
+  price1MonthCzk Int      // haléře — flat price for a 1-month subscription
+  price2MonthCzk Int      // haléře — flat price for a 2-month subscription (currently just double
+                           // the 1-month price, i.e. no multi-month discount)
+  sortOrder      Int      @default(0)
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model OfficeSubscriptionInquiry {
@@ -180,11 +179,11 @@ model OfficeSubscriptionInquiry {
   email           String
   phone           String
   deliveryAddress String
-  planTier        String    // "classic" | "standard" | "luxury" — snapshot, not a hard FK, so this
-                              // stays readable even if the plan row is later edited
-  commitment      String    // "monthly" | "yearly" — billing is monthly either way; this only
-                              // affects which rate applies (see priceCzk)
-  priceCzk        Int       // haléře — resolved monthly amount to collect, snapshotted server-side
+  planTier        String    // "mini-vases" | "small-bouquet" | "medium-bouquet" | "premium-bouquet" —
+                              // snapshot, not a hard FK, so this stays readable even if the plan row
+                              // is later edited
+  duration        String    // "1month" | "2month" — which flat-rate price applies (see priceCzk)
+  priceCzk        Int       // haléře — resolved total amount to collect, snapshotted server-side
                               // from the plan row at submission time, never trusted from the client
   message         String?
   contactedAt     DateTime? // state inferred from this being set, same as CustomRequest.deliveredAt
