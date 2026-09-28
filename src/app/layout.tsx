@@ -17,13 +17,14 @@ const playfair = Playfair_Display({
   display: 'swap',
 });
 
-const TITLE = 'Navázáno by Klára — Ručně vázané kytice';
-const DESCRIPTION = 'Ručně vázané kytice a květinové dárky s doručením až k vám domů.';
+const TITLE = 'Květinářství České Budějovice — Navázáno by Klára | Ručně vázané kytice';
+const DESCRIPTION = 'Ručně vázané kytice a květinové dárky s rozvozem po Českých Budějovicích a okolí. Objednejte online, doručíme až k vám domů.';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://navazano.cz'),
   title: TITLE,
   description: DESCRIPTION,
+  keywords: 'květiny České Budějovice, květinářství České Budějovice, kytice České Budějovice, rozvoz květin České Budějovice, květinový dárek',
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
@@ -41,11 +42,37 @@ export const metadata: Metadata = {
   },
 };
 
+const localBusinessJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Florist',
+  name: 'Navázáno by Klára',
+  image: 'https://navazano.cz/og-image.png',
+  url: 'https://navazano.cz',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Pražská tř. 1586/9',
+    postalCode: '370 04',
+    addressLocality: 'České Budějovice',
+    addressCountry: 'CZ',
+  },
+  areaServed: {
+    '@type': 'City',
+    name: 'České Budějovice',
+  },
+  priceRange: '$$',
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
   return (
     <html lang="cs" className={`${inter.variable} ${playfair.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
+        />
+      </head>
       <body className="font-sans bg-cream text-ink">
         <LanguageProvider>
           <CartProvider>{children}</CartProvider>
