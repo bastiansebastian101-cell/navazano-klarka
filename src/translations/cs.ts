@@ -9,13 +9,13 @@ export const cs = {
     officeSubscriptions: 'Květinové předplatné',
   },
   home: {
-    heroTitle: 'Ručně vázané kytice s láskou',
-    heroSubtitle: 'Čerstvé květiny, doručené až k vám domů',
+    heroTitle: 'Ručně vázané kytice s láskou v Českých Budějovicích',
+    heroSubtitle: 'Čerstvé květiny s rozvozem po Českých Budějovicích až k vám domů',
     heroCta: 'Prohlédnout katalog',
     featured: 'Oblíbené kytice',
   },
   catalog: {
-    title: 'Katalog',
+    title: 'Katalog kytic a květin — rozvoz po Českých Budějovicích',
     empty: 'Momentálně nejsou k dispozici žádné produkty.',
     categories: {
       all: 'Vše',

@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
 import { prisma } from '@/lib/db';
 import { CatalogGrid } from '@/components/shop/CatalogGrid';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Katalog kytic a květin — rozvoz po Českých Budějovicích | Navázáno by Klára',
+  description: 'Ručně vázané kytice a květinové dárky s rozvozem po Českých Budějovicích. Vyberte si z naší nabídky a objednejte online.',
+};
 
 export default async function CatalogPage() {
   const products = await prisma.product.findMany({

@@ -11,13 +11,13 @@ export const en: Translations = {
     officeSubscriptions: 'Flower subscription',
   },
   home: {
-    heroTitle: 'Handmade bouquets, tied with love',
-    heroSubtitle: 'Fresh flowers, delivered to your door',
+    heroTitle: 'Handmade bouquets, tied with love, in České Budějovice',
+    heroSubtitle: 'Fresh flowers with delivery across České Budějovice, right to your door',
     heroCta: 'Browse the catalog',
     featured: 'Featured bouquets',
   },
   catalog: {
-    title: 'Catalog',
+    title: 'Bouquets & Flowers — Delivered Across České Budějovice',
     empty: 'No products are available right now.',
     categories: {
       all: 'All',
