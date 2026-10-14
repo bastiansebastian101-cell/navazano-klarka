@@ -4,8 +4,24 @@ import { sendOfficeSubscriptionInquiryEmail } from '@/lib/email';
 import { checkRateLimit, getIp } from '@/lib/rateLimit';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const TIERS = ['mini-vases', 'small-bouquet', 'medium-bouquet', 'premium-bouquet'];
 const DURATIONS = ['1month', '2month'];
+
+// TEMPORARY COMPATIBILITY SHIM — see the matching comment in
+// src/app/(shop)/kancelare/page.tsx. Remove both once the real migration has
+// run against production.
+async function getPlanByTier(tier: string): Promise<{
+  tier: string; nameCs: string; active: boolean; price1MonthCzk: number; price2MonthCzk: number;
+} | null> {
+  const rows = await prisma.$queryRawUnsafe<{
+    tier: string; nameCs: string; active: boolean; priceMonthlyCzk: number;
+  }[]>(
+    `SELECT "tier", "nameCs", "active", "priceMonthlyCzk" FROM "OfficeSubscriptionPlan" WHERE "tier" = $1 LIMIT 1;`,
+    tier,
+  );
+  const r = rows[0];
+  if (!r) return null;
+  return { tier: r.tier, nameCs: r.nameCs, active: r.active, price1MonthCzk: r.priceMonthlyCzk, price2MonthCzk: r.priceMonthlyCzk * 2 };
+}
 
 export async function POST(request: NextRequest) {
   const ip = getIp(request);
@@ -25,12 +41,12 @@ export async function POST(request: NextRequest) {
 
   if (
     !companyName || !contactName || !phone || !deliveryAddress ||
-    !EMAIL_RE.test(email) || !TIERS.includes(planTier) || !DURATIONS.includes(duration)
+    !EMAIL_RE.test(email) || !planTier || !DURATIONS.includes(duration)
   ) {
     return NextResponse.json({ error: 'invalid_input' }, { status: 400 });
   }
 
-  const plan = await prisma.officeSubscriptionPlan.findUnique({ where: { tier: planTier } });
+  const plan = await getPlanByTier(planTier);
   if (!plan || !plan.active) {
     return NextResponse.json({ error: 'invalid_plan' }, { status: 400 });
   }
