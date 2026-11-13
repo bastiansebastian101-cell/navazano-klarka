@@ -8,7 +8,14 @@ function toDateInputValue(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
-export function CustomBouquetPopup() {
+type CustomBouquetPopupProps = {
+  /** Open automatically after 5 s (only for a visitor who hasn't seen a popup yet). */
+  autoOpen?: boolean;
+  onAutoOpen?: () => void;
+  onClose?: () => void;
+};
+
+export function CustomBouquetPopup({ autoOpen = false, onAutoOpen, onClose }: CustomBouquetPopupProps) {
   const { t } = useLanguage();
   const minDate = useMemo(() => toDateInputValue(earliestDeliveryDate()), []);
   const [open, setOpen] = useState(false);
@@ -26,12 +33,17 @@ export function CustomBouquetPopup() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setOpen(true), 5000);
+    if (!autoOpen) return;
+    const timer = setTimeout(() => {
+      setOpen(true);
+      onAutoOpen?.();
+    }, 5000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [autoOpen, onAutoOpen]);
 
   const handleClose = () => {
     setOpen(false);
+    onClose?.();
     if (submitted) {
       setName('');
       setEmail('');
