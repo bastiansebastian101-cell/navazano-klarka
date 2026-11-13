@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import { formatCzk } from './format';
 import { DELIVERY_WINDOW_LABELS_CS } from './delivery-labels';
+import { paymentLabelCs } from './paymentLabels';
 import { generatePaymentQrAsset, formatIbanForDisplay } from './payment';
 
 let _resend: Resend | null = null;
@@ -53,7 +54,7 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
 
   const windowLabel = DELIVERY_WINDOW_LABELS_CS[data.deliveryWindow] ?? data.deliveryWindow;
   const dateLabel = data.deliveryDate.toLocaleDateString('cs-CZ');
-  const paymentLabel = data.paymentMethod === 'bank_transfer' ? 'Bankovní převod' : 'Platba při doručení';
+  const paymentLabel = paymentLabelCs(data.paymentMethod) + (data.paymentMethod === 'gopay' ? ' — zaplaceno ✅' : '');
 
   const bankDetails =
     data.paymentMethod === 'bank_transfer' && process.env.BANK_IBAN
@@ -124,7 +125,7 @@ export async function sendNewOrderAlertEmail(data: OrderEmailData): Promise<bool
 
   const windowLabel = DELIVERY_WINDOW_LABELS_CS[data.deliveryWindow] ?? data.deliveryWindow;
   const dateLabel = data.deliveryDate.toLocaleDateString('cs-CZ');
-  const paymentLabel = data.paymentMethod === 'bank_transfer' ? 'Bankovní převod' : 'Platba při doručení';
+  const paymentLabel = paymentLabelCs(data.paymentMethod) + (data.paymentMethod === 'gopay' ? ' — zaplaceno ✅' : '');
 
   const html = `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;">

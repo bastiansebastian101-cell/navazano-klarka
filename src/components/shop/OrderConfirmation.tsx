@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import type { Prisma } from '@prisma/client';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -12,12 +13,41 @@ export function OrderConfirmation({
   order,
   iban,
   qrDataUrl,
+  gopayPaid = false,
 }: {
   order: OrderWithItems;
   iban: string | null;
   qrDataUrl: string | null;
+  gopayPaid?: boolean;
 }) {
   const { language, t } = useLanguage();
+  const [retrying, setRetrying] = useState(false);
+  const [retryError, setRetryError] = useState(false);
+
+  const retryPayment = async () => {
+    setRetrying(true);
+    setRetryError(false);
+    try {
+      const res = await fetch('/api/payments/gopay/retry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: order.id }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+        return;
+      }
+      if (data.error === 'already_paid') {
+        window.location.reload();
+        return;
+      }
+      setRetryError(true);
+    } catch {
+      setRetryError(true);
+    }
+    setRetrying(false);
+  };
 
   const windowLabel = DELIVERY_WINDOW_LABELS_CS[order.deliveryWindow] ?? order.deliveryWindow;
   const dateLabel = order.deliveryDate.toLocaleDateString(language === 'cs' ? 'cs-CZ' : 'en-GB');
@@ -63,7 +93,33 @@ export function OrderConfirmation({
         </p>
       </div>
 
-      {order.paymentMethod === 'cash_on_delivery' ? (
+      {order.paymentMethod === 'gopay' ? (
+        gopayPaid ? (
+          <div className="mt-6 bg-sage-light rounded-2xl p-6 text-left flex items-center gap-4">
+            <span className="text-3xl" aria-hidden="true">✅</span>
+            <p className="text-sm text-ink">
+              <strong>{t.confirmation.gopayPaidTitle}</strong> {t.confirmation.gopayPaidText}
+            </p>
+          </div>
+        ) : (
+          <div className="mt-6 bg-brand-light rounded-2xl p-6 text-left">
+            <p className="text-sm text-ink">
+              <strong>⏳ {t.confirmation.gopayUnpaidTitle}</strong> {t.confirmation.gopayUnpaidText}
+            </p>
+            {order.status !== 'cancelled' && (
+              <button
+                type="button"
+                onClick={retryPayment}
+                disabled={retrying}
+                className="mt-4 inline-flex items-center gap-2 bg-ink hover:bg-ink/90 disabled:opacity-60 text-white text-sm font-semibold px-6 py-3 rounded-full transition-colors"
+              >
+                💳 {t.confirmation.gopayRetry} · {formatCzk(order.totalCzk)}
+              </button>
+            )}
+            {retryError && <p className="mt-3 text-sm text-red-600">{t.checkout.gopayUnavailable}</p>}
+          </div>
+        )
+      ) : order.paymentMethod === 'cash_on_delivery' ? (
         <div className="mt-6 bg-sage-light rounded-2xl p-6 text-left flex items-center gap-4">
           <span className="text-3xl" aria-hidden="true">💵</span>
           <p className="text-sm text-ink">

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { isDeliveryDateValid, isDeliveryWindowValid } from '@/lib/delivery';
-import { sendOrderConfirmationEmail, sendNewOrderAlertEmail } from '@/lib/email';
 import { findValidCoupon, calculateDiscount } from '@/lib/coupon';
-import { createOrderLoginUrl } from '@/lib/orderLoginLink';
+import { sendOrderEmails } from '@/lib/orderEmails';
+import { GOPAY_METHOD, isGopayEnabled, createGopayPayment } from '@/lib/gopay';
 
 interface OrderRequestBody {
   customerName: string;
@@ -13,6 +13,7 @@ interface OrderRequestBody {
   deliveryDate: string; // ISO date
   deliveryWindow: string;
   paymentMethod?: string;
+  termsAccepted?: boolean;
   notes?: string;
   couponCode?: string;
   occasionReason?: string;
@@ -35,12 +36,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'missing_fields' }, { status: 400 });
     }
 
+    // Consent to the terms of sale is required (checkbox at checkout).
+    if (body.termsAccepted !== true) {
+      return NextResponse.json({ error: 'terms_required' }, { status: 400 });
+    }
+
     if (!isDeliveryWindowValid(body.deliveryWindow)) {
       return NextResponse.json({ error: 'invalid_delivery_window' }, { status: 400 });
     }
 
     // Only the payment methods we actually offer; anything else falls back to bank transfer.
-    const paymentMethod = body.paymentMethod === 'cash_on_delivery' ? 'cash_on_delivery' : 'bank_transfer';
+    const paymentMethod =
+      body.paymentMethod === 'cash_on_delivery'
+        ? 'cash_on_delivery'
+        : body.paymentMethod === GOPAY_METHOD && isGopayEnabled()
+          ? GOPAY_METHOD
+          : 'bank_transfer';
 
     const deliveryDate = new Date(body.deliveryDate);
     if (Number.isNaN(deliveryDate.getTime()) || !isDeliveryDateValid(deliveryDate)) {
@@ -162,33 +173,39 @@ export async function POST(request: NextRequest) {
       throw err;
     }
 
-    const emailData = {
-      orderId: order.id,
-      orderNumber: order.orderNumber,
-      customerName: order.customerName,
-      customerEmail: order.email,
-      deliveryAddress: order.deliveryAddress,
-      deliveryDate: order.deliveryDate,
-      deliveryWindow: order.deliveryWindow,
-      paymentMethod: order.paymentMethod,
-      subtotalCzk,
-      discountCzk: order.discountCzk,
-      totalCzk: order.totalCzk,
-      items: order.items.map((i) => ({
-        nameCs: i.product.nameCs,
-        variantLabel: i.variantLabel,
-        quantity: i.quantity,
-        priceCzk: i.priceCzk,
-      })),
-    };
+    if (order.paymentMethod === GOPAY_METHOD) {
+      // Card / Google Pay: send the customer to GoPay. Emails go out only once
+      // GoPay confirms the payment (see /api/payments/gopay/notify + return).
+      try {
+        const redirectUrl = await createGopayPayment(
+          {
+            id: order.id,
+            orderNumber: order.orderNumber,
+            customerName: order.customerName,
+            email: order.email,
+            phone: order.phone,
+            totalCzk: order.totalCzk,
+            items: order.items.map((i) => ({
+              name: i.product.nameCs + (i.variantLabel ? ` (${i.variantLabel})` : ''),
+              quantity: i.quantity,
+              priceCzk: i.priceCzk,
+            })),
+          },
+          request.nextUrl.origin
+        );
+        return NextResponse.json({ orderId: order.id, redirectUrl });
+      } catch (err) {
+        console.error('GoPay payment creation failed:', err);
+        // Undo: cancel the order and give the coupon use back, so the customer can retry another way.
+        await prisma.order.update({ where: { id: order.id }, data: { status: 'cancelled' } });
+        if (order.couponId) {
+          await prisma.coupon.update({ where: { id: order.couponId }, data: { redemptionCount: { decrement: 1 } } });
+        }
+        return NextResponse.json({ error: 'payment_unavailable' }, { status: 502 });
+      }
+    }
 
-    // One-click link to the customer's order history, only in the customer's email.
-    const loginUrl = await createOrderLoginUrl(order.email);
-
-    await Promise.all([
-      sendOrderConfirmationEmail({ ...emailData, loginUrl }),
-      sendNewOrderAlertEmail(emailData),
-    ]);
+    await sendOrderEmails(order.id);
 
     return NextResponse.json({ orderId: order.id });
   } catch (err) {

@@ -5,6 +5,7 @@ import type { Prisma } from '@prisma/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatCzk } from '@/lib/format';
 import { DELIVERY_WINDOW_LABELS_CS } from '@/lib/delivery-labels';
+import { paymentLabelCs } from '@/lib/paymentLabels';
 
 type OrderWithItems = Prisma.OrderGetPayload<{ include: { items: { include: { product: true } } } }>;
 
@@ -21,6 +22,7 @@ const STATUS_COLORS: Record<string, string> = {
 export default function AdminOrdersPage() {
   const { t } = useLanguage();
   const [orders, setOrders] = useState<OrderWithItems[]>([]);
+  const [gopayPaidIds, setGopayPaidIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [resendingId, setResendingId] = useState<string | null>(null);
 
@@ -29,6 +31,7 @@ export default function AdminOrdersPage() {
     const res = await fetch('/api/admin/orders');
     const data = await res.json();
     setOrders(data.orders ?? []);
+    setGopayPaidIds(data.gopayPaidIds ?? []);
     setLoading(false);
   };
 
@@ -84,7 +87,14 @@ export default function AdminOrdersPage() {
                 <div className="text-right">
                   <p className="font-semibold text-brand">{formatCzk(order.totalCzk)}</p>
                   <p className="text-xs text-ink-lighter">
-                    {order.paymentMethod === 'bank_transfer' ? 'Bankovní převod' : 'Platba při doručení'}
+                    {paymentLabelCs(order.paymentMethod)}
+                    {order.paymentMethod === 'gopay' && (
+                      <span
+                        className={`ml-1 font-semibold ${gopayPaidIds.includes(order.id) ? 'text-sage-dark' : 'text-amber-600'}`}
+                      >
+                        {gopayPaidIds.includes(order.id) ? '· Zaplaceno ✅' : '· Nezaplaceno ⏳'}
+                      </span>
+                    )}
                   </p>
                 </div>
               </div>

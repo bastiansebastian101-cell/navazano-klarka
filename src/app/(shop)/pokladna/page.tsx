@@ -34,7 +34,21 @@ export default function CheckoutPage() {
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [deliveryDate, setDeliveryDate] = useState(minDate);
   const [deliveryWindow, setDeliveryWindow] = useState<DeliveryWindow>(DELIVERY_WINDOWS[0]);
-  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'cash_on_delivery'>('bank_transfer');
+  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'cash_on_delivery' | 'gopay'>('bank_transfer');
+  // Card / Google Pay is offered only when GoPay is configured on the server.
+  const [gopayEnabled, setGopayEnabled] = useState(false);
+  useEffect(() => {
+    fetch('/api/payment-methods', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : { gopay: false }))
+      .then((d) => {
+        if (d.gopay) {
+          setGopayEnabled(true);
+          setPaymentMethod('gopay'); // fastest way to pay — preselect it
+        }
+      })
+      .catch(() => {});
+  }, []);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [notes, setNotes] = useState('');
   const [occasionReason, setOccasionReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -132,6 +146,7 @@ export default function CheckoutPage() {
           deliveryDate: new Date(deliveryDate).toISOString(),
           deliveryWindow,
           paymentMethod,
+          termsAccepted,
           notes,
           occasionReason,
           couponCode: appliedCoupon?.code,
@@ -147,6 +162,8 @@ export default function CheckoutPage() {
           setAppliedCoupon(null);
           setCouponError(couponReasonMessage(data.reason));
           setError(t.checkout.couponInvalid);
+        } else if (data.error === 'payment_unavailable') {
+          setError(t.checkout.gopayUnavailable);
         } else {
           setError(t.checkout.genericError);
         }
@@ -156,6 +173,10 @@ export default function CheckoutPage() {
 
       const data = await res.json();
       clear();
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl; // GoPay payment page
+        return;
+      }
       router.push(`/objednavka/${data.orderId}/potvrzeni`);
     } catch {
       setError(t.checkout.genericError);
@@ -275,12 +296,17 @@ export default function CheckoutPage() {
 
         <div>
           <h2 className="font-medium text-ink mb-3">{t.checkout.paymentMethod}</h2>
-          <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label={t.checkout.paymentMethod}>
+          <div
+            className={`grid gap-2 ${gopayEnabled ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}
+            role="radiogroup"
+            aria-label={t.checkout.paymentMethod}
+          >
             {(
               [
-                { value: 'bank_transfer', label: t.checkout.bankTransfer, icon: '🏦' },
-                { value: 'cash_on_delivery', label: t.checkout.cashOnDelivery, icon: '💵' },
-              ] as const
+                ...(gopayEnabled ? [{ value: 'gopay', label: t.checkout.gopay, icon: '💳' } as const] : []),
+                { value: 'bank_transfer', label: t.checkout.bankTransfer, icon: '🏦' } as const,
+                { value: 'cash_on_delivery', label: t.checkout.cashOnDelivery, icon: '💵' } as const,
+              ]
             ).map((opt) => (
               <label
                 key={opt.value}
@@ -324,6 +350,27 @@ export default function CheckoutPage() {
             className="w-full border border-ink-lighter/30 rounded-lg px-4 py-2.5"
           />
         </div>
+
+        <label className="flex items-start gap-3 text-sm text-ink cursor-pointer">
+          <input
+            type="checkbox"
+            required
+            checked={termsAccepted}
+            onChange={(e) => setTermsAccepted(e.target.checked)}
+            className="mt-0.5 h-4 w-4 accent-brand flex-shrink-0"
+          />
+          <span>
+            {t.checkout.termsAgreePrefix}{' '}
+            <Link href="/obchodni-podminky" target="_blank" className="text-brand underline">
+              {t.checkout.termsLink}
+            </Link>{' '}
+            {t.checkout.termsAgreeMiddle}{' '}
+            <Link href="/ochrana-osobnich-udaju" target="_blank" className="text-brand underline">
+              {t.checkout.privacyLink}
+            </Link>
+            .
+          </span>
+        </label>
 
         {error && <p className="text-red-600 text-sm">{error}</p>}
 
