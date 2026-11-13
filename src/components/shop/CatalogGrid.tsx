@@ -24,7 +24,7 @@ export function CatalogGrid({ products }: { products: (Product & { variants: Pro
               category === cat ? 'bg-brand text-white' : 'bg-white text-ink-light hover:bg-brand-light'
             }`}
           >
-            {cat === 'all' ? t.catalog.categories.all : cat}
+            {(t.catalog.categories as Record<string, string>)[cat] ?? cat}
           </button>
         ))}
       </div>

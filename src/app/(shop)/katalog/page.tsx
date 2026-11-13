@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Katalog kytic a květin — rozvoz po Českých Budějovicích | Navázáno by Klára',
-  description: 'Ručně vázané kytice a květinové dárky s rozvozem po Českých Budějovicích. Vyberte si z naší nabídky a objednejte online.',
+  description: 'Kytice a květiny z květinářství Navázáno v Českých Budějovicích. Ručně vázané kytice a květinové dárky s rozvozem zdarma — objednejte online.',
 };
 
 export default async function CatalogPage() {

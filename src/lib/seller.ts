@@ -9,7 +9,7 @@ export const SELLER = {
   ico: '23585081',
   dic: '', // not a VAT payer
   vatPayer: false,
-  street: 'Pražská třída 9',
+  street: 'Pražská třída 1586/9',
   zip: '370 04',
   city: 'České Budějovice',
   email: 'navazanocz@gmail.com',

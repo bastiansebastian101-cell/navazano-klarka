@@ -4,6 +4,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import './globals.css';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CartProvider } from '@/contexts/CartContext';
+import { SELLER } from '@/lib/seller';
 
 const inter = Inter({
   subsets: ['latin', 'latin-ext'],
@@ -46,6 +47,13 @@ const localBusinessJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Florist',
   name: 'Navázáno by Klára',
+  description:
+    'Květinářství v Českých Budějovicích — ručně vázané kytice, květiny a květinové dárky s rozvozem zdarma po Českých Budějovicích a okolí.',
+  telephone: SELLER.phone.replace(/\s/g, ''),
+  email: SELLER.email,
+  sameAs: ['https://www.instagram.com/navazano.byklara/', 'https://www.facebook.com/share/19MtZK7uGb/'],
+  paymentAccepted: 'Cash, Bank transfer',
+  currenciesAccepted: 'CZK',
   image: 'https://navazano.cz/og-image.png',
   url: 'https://navazano.cz',
   address: {
@@ -55,10 +63,10 @@ const localBusinessJsonLd = {
     addressLocality: 'České Budějovice',
     addressCountry: 'CZ',
   },
-  areaServed: {
-    '@type': 'City',
-    name: 'České Budějovice',
-  },
+  areaServed: [
+    { '@type': 'City', name: 'České Budějovice' },
+    { '@type': 'AdministrativeArea', name: 'Českobudějovicko (PSČ 370–373)' },
+  ],
   priceRange: '$$',
 };
 
