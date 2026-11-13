@@ -98,7 +98,12 @@ export function DeliveryCountdownBar() {
                 <span className="countdown-colon">:</span>
                 {mm}
                 <span className="countdown-colon">:</span>
-                {ss}
+                {/* key changes every second, so the tick animation replays */}
+                <span className="inline-block min-w-[2ch] rounded bg-white px-0.5 text-center text-brand-dark overflow-hidden align-middle">
+                  <span key={ss} className="countdown-tick inline-block">
+                    {ss}
+                  </span>
+                </span>
               </>
             ) : (
               '--:--:--'
