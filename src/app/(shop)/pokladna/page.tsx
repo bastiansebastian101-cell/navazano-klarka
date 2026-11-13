@@ -8,8 +8,10 @@ import { useCart } from '@/contexts/CartContext';
 import { formatCzk } from '@/lib/format';
 import { DELIVERY_WINDOWS, earliestDeliveryDate, type DeliveryWindow } from '@/lib/delivery';
 
+// Calendar date as YYYY-MM-DD (not via toISOString, which shifts to UTC and
+// shows the previous day for Czech visitors).
 function toDateInputValue(d: Date): string {
-  return d.toISOString().slice(0, 10);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 interface AppliedCoupon {

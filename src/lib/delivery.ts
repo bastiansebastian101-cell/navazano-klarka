@@ -1,20 +1,38 @@
 export const DELIVERY_WINDOWS = ['9-12', '12-15', '15-18'] as const;
 export type DeliveryWindow = (typeof DELIVERY_WINDOWS)[number];
 
-// Orders placed before this hour (local time) can still get next-day delivery;
+// Orders placed before this hour (Czech time) can still get next-day delivery;
 // after it, the earliest slot pushes out one more day.
 export const ORDER_CUTOFF_HOUR = 15;
+
+// The shop works on Czech time, whatever timezone the server (UTC on Vercel)
+// or the visitor's device is in.
+export const SHOP_TIME_ZONE = 'Europe/Prague';
+
+/** Calendar date and hour in Czech time for a given instant. */
+export function pragueParts(now: Date = new Date()): { year: number; month: number; day: number; hour: number } {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: SHOP_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(now);
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value ?? 0);
+  return { year: get('year'), month: get('month') - 1, day: get('day'), hour: get('hour') };
+}
 
 function startOfDay(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
 // Earliest date a delivery can be scheduled for, given when the order is placed.
+// "Today" and the cutoff hour are both taken in Czech time.
 export function earliestDeliveryDate(now: Date = new Date()): Date {
-  const daysAhead = now.getHours() < ORDER_CUTOFF_HOUR ? 1 : 2;
-  const earliest = startOfDay(now);
-  earliest.setDate(earliest.getDate() + daysAhead);
-  return earliest;
+  const { year, month, day, hour } = pragueParts(now);
+  const daysAhead = hour < ORDER_CUTOFF_HOUR ? 1 : 2;
+  return new Date(year, month, day + daysAhead);
 }
 
 // Re-validated server-side on every order — never trust a client-picked date.

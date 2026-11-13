@@ -94,7 +94,35 @@
     transform: translateY(-2px) rotate(-8deg);
   }
 }
+/* ---- Top delivery countdown bar ---- */
+.countdown-glow {
+  background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.22) 50%, transparent 65%);
+  transform: translateX(-100%);
+  animation: countdown-glow 6s ease-in-out infinite;
+}
+.countdown-colon {
+  animation: colon-blink 1s steps(1) infinite;
+}
+@keyframes countdown-glow {
+  0%,
+  55% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+@keyframes colon-blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .countdown-glow,
+  .countdown-colon {
+    animation: none;
+  }
   .hero-badge {
     opacity: 1;
     animation: none;

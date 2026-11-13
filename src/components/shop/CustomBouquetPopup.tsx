@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { earliestDeliveryDate } from '@/lib/delivery';
 
+// Calendar date as YYYY-MM-DD (not via toISOString, which shifts to UTC and
+// shows the previous day for Czech visitors).
 function toDateInputValue(d: Date): string {
-  return d.toISOString().slice(0, 10);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 type CustomBouquetPopupProps = {

@@ -16,6 +16,12 @@ export const cs = {
     cashOnDelivery: 'Platba při převzetí',
     featured: 'Oblíbené kytice',
   },
+  countdown: {
+    beforeCutoff: 'Objednejte do {time} a doručíme zítra',
+    afterCutoff: 'Objednejte do zítřka {time} a doručíme pozítří',
+    free: 'doprava zdarma',
+    timeLeft: 'Zbývá',
+  },
   catalog: {
     title: 'Katalog kytic a květin — rozvoz po Českých Budějovicích',
     empty: 'Momentálně nejsou k dispozici žádné produkty.',

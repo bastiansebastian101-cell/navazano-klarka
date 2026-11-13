@@ -18,6 +18,12 @@ export const en: Translations = {
     cashOnDelivery: 'Cash on delivery',
     featured: 'Featured bouquets',
   },
+  countdown: {
+    beforeCutoff: 'Order by {time} for delivery tomorrow',
+    afterCutoff: 'Order by {time} tomorrow for delivery the day after',
+    free: 'free delivery',
+    timeLeft: 'Time left',
+  },
   catalog: {
     title: 'Bouquets & Flowers — Delivered Across České Budějovice',
     empty: 'No products are available right now.',
