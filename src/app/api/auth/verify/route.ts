@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { CUSTOMER_COOKIE_NAME, createCustomerSessionCookie } from '@/lib/customerAuth';
+import { isReusableOrderToken } from '@/lib/orderLoginLink';
 
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get('token');
@@ -11,7 +12,8 @@ export async function GET(request: NextRequest) {
   }
 
   const loginToken = await prisma.loginToken.findUnique({ where: { token } });
-  if (!loginToken || loginToken.usedAt || loginToken.expiresAt < new Date()) {
+  const reusable = isReusableOrderToken(token); // order-email links survive mail scanners
+  if (!loginToken || (loginToken.usedAt && !reusable) || loginToken.expiresAt < new Date()) {
     return NextResponse.redirect(`${baseUrl}/ucet?error=expired`);
   }
 

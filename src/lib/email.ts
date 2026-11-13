@@ -34,6 +34,8 @@ interface OrderEmailData {
   discountCzk?: number;
   totalCzk: number;
   items: { nameCs: string; variantLabel?: string | null; quantity: number; priceCzk: number }[];
+  /** One-click login to order history (customer email only). */
+  loginUrl?: string | null;
 }
 
 function itemsTable(items: OrderEmailData['items']): string {
@@ -91,7 +93,18 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
           <p style="margin:0;color:#111;font-size:14px;"><strong>Platba:</strong> ${paymentLabel}</p>
           ${bankDetails}
         </div>
-        <p style="margin-top:20px;color:#555;font-size:13px;">Uložili jsme vaše údaje, abyste mohli sledovat historii objednávek. Přihlaste se pomocí e-mailu <strong>${data.customerEmail}</strong> na <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://navazano.cz'}/ucet" style="color:#B8567A;">navazano.cz/ucet</a>.</p>
+        ${
+          data.loginUrl
+            ? `
+        <div style="margin-top:24px;padding:20px;background:#FFF8FB;border:1px solid #FFE9F3;border-radius:12px;text-align:center;">
+          <p style="margin:0 0 4px;color:#111;font-size:15px;font-weight:600;">Váš účet je připravený 🌸</p>
+          <p style="margin:0 0 16px;color:#555;font-size:13px;line-height:1.5;">Automaticky jsme vám založili účet. Jedním kliknutím uvidíte stav a historii svých objednávek — bez hesla.</p>
+          <a href="${data.loginUrl}" style="display:inline-block;background:#F582B3;color:#fff;text-decoration:none;font-weight:600;padding:12px 28px;border-radius:999px;">📦 Zobrazit moje objednávky</a>
+          <p style="margin:14px 0 0;color:#999;font-size:12px;line-height:1.5;">Odkaz platí 30 dní. Později se kdykoli přihlásíte na <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://navazano.cz'}/ucet" style="color:#B8567A;">navazano.cz/ucet</a> pomocí e-mailu <strong>${data.customerEmail}</strong>. Odkaz nikomu nepřeposílejte.</p>
+        </div>`
+            : `
+        <p style="margin-top:20px;color:#555;font-size:13px;">Uložili jsme vaše údaje, abyste mohli sledovat historii objednávek. Přihlaste se pomocí e-mailu <strong>${data.customerEmail}</strong> na <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://navazano.cz'}/ucet" style="color:#B8567A;">navazano.cz/ucet</a>.</p>`
+        }
         <p style="color:#999;font-size:12px;margin-top:32px;">Navázáno by Klára</p>
       </div>
     `,

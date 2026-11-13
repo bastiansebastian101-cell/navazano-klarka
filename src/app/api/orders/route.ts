@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { isDeliveryDateValid, isDeliveryWindowValid } from '@/lib/delivery';
 import { sendOrderConfirmationEmail, sendNewOrderAlertEmail } from '@/lib/email';
 import { findValidCoupon, calculateDiscount } from '@/lib/coupon';
+import { createOrderLoginUrl } from '@/lib/orderLoginLink';
 
 interface OrderRequestBody {
   customerName: string;
@@ -181,7 +182,13 @@ export async function POST(request: NextRequest) {
       })),
     };
 
-    await Promise.all([sendOrderConfirmationEmail(emailData), sendNewOrderAlertEmail(emailData)]);
+    // One-click link to the customer's order history, only in the customer's email.
+    const loginUrl = await createOrderLoginUrl(order.email);
+
+    await Promise.all([
+      sendOrderConfirmationEmail({ ...emailData, loginUrl }),
+      sendNewOrderAlertEmail(emailData),
+    ]);
 
     return NextResponse.json({ orderId: order.id });
   } catch (err) {
