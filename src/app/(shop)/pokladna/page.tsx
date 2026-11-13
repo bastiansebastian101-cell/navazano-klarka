@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { formatCzk } from '@/lib/format';
 import { DELIVERY_WINDOWS, earliestDeliveryDate, type DeliveryWindow } from '@/lib/delivery';
+import type { ActivePromo } from '@/lib/promoBanner';
 
 // Calendar date as YYYY-MM-DD (not via toISOString, which shifts to UTC and
 // shows the previous day for Czech visitors).
@@ -57,22 +58,38 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleApplyCoupon = async () => {
-    if (!couponInput.trim()) return;
+  // The offer currently advertised in the top promo bar (if any), for one-click apply.
+  const [promo, setPromo] = useState<ActivePromo | null>(null);
+  useEffect(() => {
+    fetch('/api/promo-banner', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : { promo: null }))
+      .then((d) => setPromo(d.promo ?? null))
+      .catch(() => {});
+  }, []);
+  const promoSavingCzk = promo
+    ? promo.discountType === 'percentage'
+      ? Math.round((totalCzk * promo.discountValue) / 100)
+      : Math.min(promo.discountValue, totalCzk)
+    : 0;
+
+  const handleApplyCoupon = async (codeOverride?: string) => {
+    const code = (codeOverride ?? couponInput).trim();
+    if (!code) return;
+    if (codeOverride) setCouponInput(codeOverride);
     setApplyingCoupon(true);
     setCouponError(null);
     try {
       const res = await fetch('/api/coupons/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: couponInput.trim(), subtotalCzk: totalCzk }),
+        body: JSON.stringify({ code, subtotalCzk: totalCzk }),
       });
       const data = await res.json();
       if (!data.valid) {
         setAppliedCoupon(null);
         setCouponError(couponReasonMessage(data.reason));
       } else {
-        setAppliedCoupon({ code: couponInput.trim(), discountCzk: data.discountCzk, newTotalCzk: data.newTotalCzk });
+        setAppliedCoupon({ code, discountCzk: data.discountCzk, newTotalCzk: data.newTotalCzk });
       }
     } catch {
       setCouponError(t.checkout.couponInvalid);
@@ -147,11 +164,47 @@ export default function CheckoutPage() {
   };
 
   const finalTotal = appliedCoupon ? appliedCoupon.newTotalCzk : totalCzk;
+  const promoApplied = !!promo && appliedCoupon?.code.toUpperCase() === promo.code;
+  const showPromoOffer = !!promo && promoSavingCzk > 0 && !promoApplied;
+
+  const promoOfferButton = (big: boolean) => (
+    <button
+      type="button"
+      onClick={() => promo && handleApplyCoupon(promo.code)}
+      disabled={applyingCoupon}
+      className={`shine relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-full bg-ink text-white font-semibold shadow-card hover:bg-ink/90 disabled:opacity-60 transition-colors ${
+        big ? 'w-full sm:w-auto px-6 py-3' : 'px-4 py-2 text-sm'
+      }`}
+    >
+      🎁 {t.checkout.promoApply.replace('{amount}', formatCzk(promoSavingCzk))}
+    </button>
+  );
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 lg:grid-cols-3 gap-10">
       <form onSubmit={handleSubmit} className="lg:col-span-2 space-y-6">
         <h1 className="font-display text-3xl text-ink">{t.checkout.title}</h1>
+
+        {showPromoOffer && (
+          <div className="rounded-2xl border-2 border-dashed border-brand bg-brand-light p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
+            <div className="flex-1">
+              <p className="font-display text-lg text-ink">
+                {t.checkout.promoTitle.replace('{amount}', formatCzk(promoSavingCzk))}
+              </p>
+              <p className="text-sm text-ink-light">
+                {t.checkout.promoSubtitle
+                  .replace('{code}', promo!.code)
+                  .replace('{total}', formatCzk(totalCzk - promoSavingCzk))}
+              </p>
+            </div>
+            {promoOfferButton(true)}
+          </div>
+        )}
+        {promoApplied && appliedCoupon && (
+          <div className="rounded-2xl bg-sage-light text-sage-dark px-4 py-3 text-sm font-semibold">
+            ✓ {t.checkout.promoApplied.replace('{amount}', formatCzk(appliedCoupon.discountCzk))}
+          </div>
+        )}
 
         <div>
           <h2 className="font-medium text-ink mb-3">{t.checkout.contactInfo}</h2>
@@ -274,12 +327,23 @@ export default function CheckoutPage() {
 
         {error && <p className="text-red-600 text-sm">{error}</p>}
 
+        {showPromoOffer && (
+          <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-ink-light">
+            <span>{t.checkout.promoReminder}</span>
+            {promoOfferButton(false)}
+          </div>
+        )}
+
         <button
           type="submit"
           disabled={submitting}
           className="w-full bg-brand hover:bg-brand-hover disabled:opacity-60 text-white font-semibold py-3.5 rounded-full transition-colors"
         >
-          {submitting ? t.checkout.submitting : t.checkout.submit}
+          {submitting
+            ? t.checkout.submitting
+            : appliedCoupon && appliedCoupon.discountCzk > 0
+              ? `${t.checkout.submit} · ${t.checkout.youSave.replace('{amount}', formatCzk(appliedCoupon.discountCzk))}`
+              : t.checkout.submit}
         </button>
       </form>
 
@@ -317,7 +381,7 @@ export default function CheckoutPage() {
               />
               <button
                 type="button"
-                onClick={handleApplyCoupon}
+                onClick={() => handleApplyCoupon()}
                 disabled={applyingCoupon || !couponInput.trim()}
                 className="flex-shrink-0 bg-ink text-white text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50"
               >

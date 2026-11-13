@@ -4,6 +4,40 @@ import { useEffect, useState } from 'react';
 import type { Coupon } from '@prisma/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatCzk } from '@/lib/format';
+import { SHOP_TIME_ZONE } from '@/lib/delivery';
+
+/** Offset of Czech time from UTC (ms) at a given instant. */
+function pragueOffsetMs(ts: number): number {
+  const p = new Intl.DateTimeFormat('en-GB', {
+    timeZone: SHOP_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(new Date(ts));
+  const g = (t: string) => Number(p.find((x) => x.type === t)?.value ?? 0);
+  return Date.UTC(g('year'), g('month') - 1, g('day'), g('hour'), g('minute')) - Math.floor(ts / 60000) * 60000;
+}
+
+/** "2026-11-20T18:00" typed as Czech time -> ISO instant, whatever the admin's own timezone is. */
+function pragueLocalToIso(value: string): string {
+  const [d, t = '23:59'] = value.split('T');
+  const [y, mo, da] = d.split('-').map(Number);
+  const [h, mi] = t.split(':').map(Number);
+  const asUtc = Date.UTC(y, mo - 1, da, h, mi);
+  let ts = asUtc - pragueOffsetMs(asUtc);
+  ts = asUtc - pragueOffsetMs(ts); // second pass handles the DST switch
+  return new Date(ts).toISOString();
+}
+
+function isLiveNow(c: Coupon): boolean {
+  if (!c.active) return false;
+  if (c.expiresAt && new Date(c.expiresAt).getTime() <= Date.now()) return false;
+  if (c.maxRedemptions !== null && c.redemptionCount >= c.maxRedemptions) return false;
+  return true;
+}
 
 export default function AdminCouponsPage() {
   const { t } = useLanguage();
@@ -18,12 +52,16 @@ export default function AdminCouponsPage() {
   const [expiresAt, setExpiresAt] = useState('');
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [bannerCouponId, setBannerCouponId] = useState<string | null>(null);
+  const [bannerSaving, setBannerSaving] = useState(false);
 
   const load = async () => {
     setLoading(true);
     const res = await fetch('/api/admin/coupons');
     const data = await res.json();
     setCoupons(data.coupons ?? []);
+    const b = await fetch('/api/admin/promo-banner').then((r) => (r.ok ? r.json() : { couponId: null }));
+    setBannerCouponId(b.couponId ?? null);
     setLoading(false);
   };
 
@@ -47,6 +85,18 @@ export default function AdminCouponsPage() {
     });
   };
 
+  const handleToggleBanner = async (coupon: Coupon) => {
+    const next = bannerCouponId === coupon.id ? null : coupon.id;
+    setBannerSaving(true);
+    const res = await fetch('/api/admin/promo-banner', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ couponId: next }),
+    });
+    if (res.ok) setBannerCouponId(next);
+    setBannerSaving(false);
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
@@ -67,7 +117,7 @@ export default function AdminCouponsPage() {
         discountType,
         discountValue: discountValueNum,
         maxRedemptions: maxRedemptions ? parseInt(maxRedemptions, 10) : null,
-        expiresAt: expiresAt || null,
+        expiresAt: expiresAt ? pragueLocalToIso(expiresAt) : null,
       }),
     });
 
@@ -156,9 +206,9 @@ export default function AdminCouponsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm text-ink-light mb-1">{t.admin.expiresAt}</label>
+              <label className="block text-sm text-ink-light mb-1">{t.admin.expiresAtTime}</label>
               <input
-                type="date"
+                type="datetime-local"
                 value={expiresAt}
                 onChange={(e) => setExpiresAt(e.target.value)}
                 className="w-full border border-ink-lighter/30 rounded-lg px-4 py-2.5"
@@ -178,6 +228,8 @@ export default function AdminCouponsPage() {
         </form>
       )}
 
+      <p className="mb-4 text-sm text-ink-light bg-brand-light rounded-xl px-4 py-3">📣 {t.admin.bannerHelp}</p>
+
       {loading ? null : coupons.length === 0 ? (
         <p className="text-ink-light">{t.admin.noCoupons}</p>
       ) : (
@@ -190,9 +242,24 @@ export default function AdminCouponsPage() {
                   {coupon.discountType === 'percentage' ? `${coupon.discountValue}%` : formatCzk(coupon.discountValue)}
                   {' · '}
                   {t.admin.redemptions}: {coupon.redemptionCount}/{coupon.maxRedemptions ?? '∞'}
-                  {coupon.expiresAt && ` · ${new Date(coupon.expiresAt).toLocaleDateString('cs-CZ')}`}
+                  {coupon.expiresAt &&
+                    ` · ${new Date(coupon.expiresAt).toLocaleString('cs-CZ', { timeZone: SHOP_TIME_ZONE, dateStyle: 'short', timeStyle: 'short' })}`}
                 </p>
+                {bannerCouponId === coupon.id && (
+                  <p className="mt-1 text-xs text-ink-light">
+                    {!isLiveNow(coupon) ? `⚠️ ${t.admin.bannerHidden}` : !coupon.expiresAt ? `ℹ️ ${t.admin.bannerNoExpiry}` : null}
+                  </p>
+                )}
               </div>
+              <button
+                onClick={() => handleToggleBanner(coupon)}
+                disabled={bannerSaving}
+                className={`text-xs font-medium px-3 py-1.5 rounded-full disabled:opacity-60 ${
+                  bannerCouponId === coupon.id ? 'bg-ink text-white' : 'bg-brand-light text-brand-dark hover:bg-brand/20'
+                }`}
+              >
+                {bannerCouponId === coupon.id ? t.admin.inBanner : `📣 ${t.admin.showInBanner}`}
+              </button>
               <button
                 onClick={() => handleToggleActive(coupon)}
                 className={`text-xs font-medium px-3 py-1.5 rounded-full ${
