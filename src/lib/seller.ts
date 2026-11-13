@@ -5,7 +5,7 @@
 export const SELLER = {
   shopName: 'Navázáno by Klára',
   web: 'navazano.cz',
-  legalName: 'Klára Hva', // full official name as registered — confirm exact spelling
+  legalName: 'Sebin Varghese', // full official name of the IČO holder
   ico: '23585081',
   dic: '', // not a VAT payer
   vatPayer: false,
