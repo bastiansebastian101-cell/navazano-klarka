@@ -27,6 +27,8 @@ interface CartContextType {
   clear: () => void;
   totalCzk: number;
   totalCount: number;
+  /** Goes up by one on every add-to-cart, so the header can blink the cart button. */
+  addedCount: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -35,6 +37,7 @@ const STORAGE_KEY = 'navazano-cart';
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const [addedCount, setAddedCount] = useState(0);
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -67,6 +70,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, { ...item, quantity }];
     });
+    setAddedCount((n) => n + 1);
   };
 
   const removeItem = (productId: string, variantId: string | null) => {
@@ -89,7 +93,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const totalCount = items.reduce((sum, i) => sum + i.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, setQuantity, clear, totalCzk, totalCount }}>
+    <CartContext.Provider value={{ items, addItem, removeItem, setQuantity, clear, totalCzk, totalCount, addedCount }}>
       {children}
     </CartContext.Provider>
   );

@@ -9,7 +9,7 @@ import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 
 export function Header() {
   const { t } = useLanguage();
-  const { totalCount } = useCart();
+  const { totalCount, addedCount } = useCart();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -61,12 +61,20 @@ export function Header() {
             {t.nav.account}
           </Link>
           <Link
+            // New key on every add-to-cart replays the blink animation.
+            key={addedCount}
             href="/kosik"
-            className="relative inline-flex items-center gap-2 bg-brand hover:bg-brand-hover text-white text-sm font-semibold px-3 sm:px-4 py-2 rounded-full transition-colors"
+            className={`relative inline-flex items-center gap-2 bg-brand hover:bg-brand-hover text-white text-sm font-semibold px-3 sm:px-4 py-2 rounded-full transition-colors ${
+              addedCount > 0 ? 'cart-blink' : ''
+            }`}
           >
             {t.nav.cart}
             {totalCount > 0 && (
-              <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full bg-white text-brand text-xs font-bold">
+              <span
+                className={`inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full bg-white text-brand text-xs font-bold ${
+                  addedCount > 0 ? 'cart-badge-pop' : ''
+                }`}
+              >
                 {totalCount}
               </span>
             )}
