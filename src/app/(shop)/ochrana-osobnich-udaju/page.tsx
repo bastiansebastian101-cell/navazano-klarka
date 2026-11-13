@@ -60,7 +60,7 @@ export default function PrivacyPage() {
         <li>Vercel Inc. — provoz webu a ukládání nahraných fotografií</li>
         <li>Neon Inc. — databáze (servery v EU)</li>
         <li>Resend (Plus Five Five, Inc.) — odesílání e-mailů</li>
-        <li>GOPAY s.r.o. — platby kartou, Google Pay a Apple Pay (pokud tuto platbu zvolíte)</li>
+        <li>ComGate Payments, a.s. nebo GOPAY s.r.o. — online platby kartou, Google Pay, Apple Pay a bankovním převodem (pokud tuto platbu zvolíte)</li>
         <li>Google Ireland Ltd. — Google Analytics</li>
       </ul>
       <p>

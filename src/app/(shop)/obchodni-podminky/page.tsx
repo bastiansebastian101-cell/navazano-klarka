@@ -74,7 +74,7 @@ export default function TermsPage() {
         </li>
         <li>
           <strong>Platební kartou, Google Pay nebo Apple Pay</strong> — je-li tento způsob v objednávce nabízen, platba
-          probíhá přes platební bránu GoPay. Prodávající nemá přístup k údajům o platební kartě.
+          probíhá přes zabezpečenou platební bránu (Comgate nebo GoPay). Prodávající nemá přístup k údajům o platební kartě.
         </li>
       </ul>
 

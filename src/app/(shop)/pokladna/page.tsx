@@ -34,16 +34,16 @@ export default function CheckoutPage() {
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [deliveryDate, setDeliveryDate] = useState(minDate);
   const [deliveryWindow, setDeliveryWindow] = useState<DeliveryWindow>(DELIVERY_WINDOWS[0]);
-  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'cash_on_delivery' | 'gopay'>('bank_transfer');
-  // Card / Google Pay is offered only when GoPay is configured on the server.
-  const [gopayEnabled, setGopayEnabled] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'cash_on_delivery' | 'card'>('bank_transfer');
+  // Card / Google Pay / Apple Pay is offered only when a payment gateway is configured.
+  const [onlineEnabled, setOnlineEnabled] = useState(false);
   useEffect(() => {
     fetch('/api/payment-methods', { cache: 'no-store' })
-      .then((r) => (r.ok ? r.json() : { gopay: false }))
+      .then((r) => (r.ok ? r.json() : { online: false }))
       .then((d) => {
-        if (d.gopay) {
-          setGopayEnabled(true);
-          setPaymentMethod('gopay'); // fastest way to pay — preselect it
+        if (d.online) {
+          setOnlineEnabled(true);
+          setPaymentMethod('card'); // fastest way to pay — preselect it
         }
       })
       .catch(() => {});
@@ -163,7 +163,7 @@ export default function CheckoutPage() {
           setCouponError(couponReasonMessage(data.reason));
           setError(t.checkout.couponInvalid);
         } else if (data.error === 'payment_unavailable') {
-          setError(t.checkout.gopayUnavailable);
+          setError(t.checkout.onlineUnavailable);
         } else {
           setError(t.checkout.genericError);
         }
@@ -297,13 +297,13 @@ export default function CheckoutPage() {
         <div>
           <h2 className="font-medium text-ink mb-3">{t.checkout.paymentMethod}</h2>
           <div
-            className={`grid gap-2 ${gopayEnabled ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}
+            className={`grid gap-2 ${onlineEnabled ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}
             role="radiogroup"
             aria-label={t.checkout.paymentMethod}
           >
             {(
               [
-                ...(gopayEnabled ? [{ value: 'gopay', label: t.checkout.gopay, icon: '💳' } as const] : []),
+                ...(onlineEnabled ? [{ value: 'card', label: t.checkout.onlinePayment, icon: '💳' } as const] : []),
                 { value: 'bank_transfer', label: t.checkout.bankTransfer, icon: '🏦' } as const,
                 { value: 'cash_on_delivery', label: t.checkout.cashOnDelivery, icon: '💵' } as const,
               ]

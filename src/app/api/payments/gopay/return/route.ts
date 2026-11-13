@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { syncGopayPayment } from '@/lib/gopay';
+import { syncPayment } from '@/lib/payments';
 import { sendOrderEmails } from '@/lib/orderEmails';
 
 export const dynamic = 'force-dynamic';
@@ -7,9 +7,8 @@ export const dynamic = 'force-dynamic';
 // GoPay sends the customer back here: /api/payments/gopay/return?id=<paymentId>
 export async function GET(request: NextRequest) {
   const base = request.nextUrl.origin;
-  const id = request.nextUrl.searchParams.get('id') ?? '';
   try {
-    const result = await syncGopayPayment(id);
+    const result = await syncPayment('gopay', request.nextUrl.searchParams.get('id') ?? '');
     if (!result) return NextResponse.redirect(`${base}/`);
     if (result.justPaid) await sendOrderEmails(result.orderId);
     return NextResponse.redirect(`${base}/objednavka/${result.orderId}/potvrzeni`);

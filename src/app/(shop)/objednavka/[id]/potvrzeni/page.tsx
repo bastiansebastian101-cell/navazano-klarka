@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/db';
 import { OrderConfirmation } from '@/components/shop/OrderConfirmation';
 import { generatePaymentQrDataUrl, formatIbanForDisplay } from '@/lib/payment';
-import { GOPAY_METHOD, isOrderPaid } from '@/lib/gopay';
+import { ONLINE_METHOD, isOrderPaid } from '@/lib/payments';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,13 +22,13 @@ export default async function OrderConfirmationPage({ params }: { params: { id: 
         })
       : null;
 
-  const gopayPaid = order.paymentMethod === GOPAY_METHOD ? await isOrderPaid(order.id) : false;
+  const onlinePaid = order.paymentMethod === ONLINE_METHOD ? await isOrderPaid(order.id) : false;
 
   const iban = process.env.BANK_IBAN ? formatIbanForDisplay(process.env.BANK_IBAN) : null;
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <OrderConfirmation order={order} iban={iban} qrDataUrl={qrDataUrl} gopayPaid={gopayPaid} />
+      <OrderConfirmation order={order} iban={iban} qrDataUrl={qrDataUrl} onlinePaid={onlinePaid} />
     </div>
   );
 }

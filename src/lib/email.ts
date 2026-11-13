@@ -54,7 +54,7 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
 
   const windowLabel = DELIVERY_WINDOW_LABELS_CS[data.deliveryWindow] ?? data.deliveryWindow;
   const dateLabel = data.deliveryDate.toLocaleDateString('cs-CZ');
-  const paymentLabel = paymentLabelCs(data.paymentMethod) + (data.paymentMethod === 'gopay' ? ' — zaplaceno ✅' : '');
+  const paymentLabel = paymentLabelCs(data.paymentMethod) + (data.paymentMethod === 'card' ? ' — zaplaceno ✅' : '');
 
   const bankDetails =
     data.paymentMethod === 'bank_transfer' && process.env.BANK_IBAN
@@ -125,7 +125,7 @@ export async function sendNewOrderAlertEmail(data: OrderEmailData): Promise<bool
 
   const windowLabel = DELIVERY_WINDOW_LABELS_CS[data.deliveryWindow] ?? data.deliveryWindow;
   const dateLabel = data.deliveryDate.toLocaleDateString('cs-CZ');
-  const paymentLabel = paymentLabelCs(data.paymentMethod) + (data.paymentMethod === 'gopay' ? ' — zaplaceno ✅' : '');
+  const paymentLabel = paymentLabelCs(data.paymentMethod) + (data.paymentMethod === 'card' ? ' — zaplaceno ✅' : '');
 
   const html = `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;">

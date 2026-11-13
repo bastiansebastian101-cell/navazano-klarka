@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { GOPAY_METHOD, createGopayPayment, isOrderPaid } from '@/lib/gopay';
+import { ONLINE_METHOD, createOnlinePayment, isOrderPaid } from '@/lib/payments';
 
 export const dynamic = 'force-dynamic';
 
-// "Zkusit zaplatit znovu" on the confirmation page: new GoPay payment for the same order.
+// "Zkusit zaplatit znovu" on the confirmation page: new payment for the same order.
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
   const orderId = typeof body.orderId === 'string' ? body.orderId : '';
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     ? await prisma.order.findUnique({ where: { id: orderId }, include: { items: { include: { product: true } } } })
     : null;
 
-  if (!order || order.paymentMethod !== GOPAY_METHOD || order.status === 'cancelled') {
+  if (!order || order.paymentMethod !== ONLINE_METHOD || order.status === 'cancelled') {
     return NextResponse.json({ error: 'not_payable' }, { status: 400 });
   }
   if (await isOrderPaid(order.id)) {
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const redirectUrl = await createGopayPayment(
+    const redirectUrl = await createOnlinePayment(
       {
         id: order.id,
         orderNumber: order.orderNumber,
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json({ redirectUrl });
   } catch (err) {
-    console.error('GoPay retry failed:', err);
+    console.error('Payment retry failed:', err);
     return NextResponse.json({ error: 'payment_unavailable' }, { status: 502 });
   }
 }

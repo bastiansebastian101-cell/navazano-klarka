@@ -22,7 +22,7 @@ const STATUS_COLORS: Record<string, string> = {
 export default function AdminOrdersPage() {
   const { t } = useLanguage();
   const [orders, setOrders] = useState<OrderWithItems[]>([]);
-  const [gopayPaidIds, setGopayPaidIds] = useState<string[]>([]);
+  const [onlinePaidIds, setOnlinePaidIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [resendingId, setResendingId] = useState<string | null>(null);
 
@@ -31,7 +31,7 @@ export default function AdminOrdersPage() {
     const res = await fetch('/api/admin/orders');
     const data = await res.json();
     setOrders(data.orders ?? []);
-    setGopayPaidIds(data.gopayPaidIds ?? []);
+    setOnlinePaidIds(data.onlinePaidIds ?? []);
     setLoading(false);
   };
 
@@ -88,11 +88,11 @@ export default function AdminOrdersPage() {
                   <p className="font-semibold text-brand">{formatCzk(order.totalCzk)}</p>
                   <p className="text-xs text-ink-lighter">
                     {paymentLabelCs(order.paymentMethod)}
-                    {order.paymentMethod === 'gopay' && (
+                    {order.paymentMethod === 'card' && (
                       <span
-                        className={`ml-1 font-semibold ${gopayPaidIds.includes(order.id) ? 'text-sage-dark' : 'text-amber-600'}`}
+                        className={`ml-1 font-semibold ${onlinePaidIds.includes(order.id) ? 'text-sage-dark' : 'text-amber-600'}`}
                       >
-                        {gopayPaidIds.includes(order.id) ? '· Zaplaceno ✅' : '· Nezaplaceno ⏳'}
+                        {onlinePaidIds.includes(order.id) ? '· Zaplaceno ✅' : '· Nezaplaceno ⏳'}
                       </span>
                     )}
                   </p>

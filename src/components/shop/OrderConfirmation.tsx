@@ -13,12 +13,12 @@ export function OrderConfirmation({
   order,
   iban,
   qrDataUrl,
-  gopayPaid = false,
+  onlinePaid = false,
 }: {
   order: OrderWithItems;
   iban: string | null;
   qrDataUrl: string | null;
-  gopayPaid?: boolean;
+  onlinePaid?: boolean;
 }) {
   const { language, t } = useLanguage();
   const [retrying, setRetrying] = useState(false);
@@ -28,7 +28,7 @@ export function OrderConfirmation({
     setRetrying(true);
     setRetryError(false);
     try {
-      const res = await fetch('/api/payments/gopay/retry', {
+      const res = await fetch('/api/payments/retry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderId: order.id }),
@@ -93,18 +93,18 @@ export function OrderConfirmation({
         </p>
       </div>
 
-      {order.paymentMethod === 'gopay' ? (
-        gopayPaid ? (
+      {order.paymentMethod === 'card' ? (
+        onlinePaid ? (
           <div className="mt-6 bg-sage-light rounded-2xl p-6 text-left flex items-center gap-4">
             <span className="text-3xl" aria-hidden="true">✅</span>
             <p className="text-sm text-ink">
-              <strong>{t.confirmation.gopayPaidTitle}</strong> {t.confirmation.gopayPaidText}
+              <strong>{t.confirmation.onlinePaidTitle}</strong> {t.confirmation.onlinePaidText}
             </p>
           </div>
         ) : (
           <div className="mt-6 bg-brand-light rounded-2xl p-6 text-left">
             <p className="text-sm text-ink">
-              <strong>⏳ {t.confirmation.gopayUnpaidTitle}</strong> {t.confirmation.gopayUnpaidText}
+              <strong>⏳ {t.confirmation.onlineUnpaidTitle}</strong> {t.confirmation.onlineUnpaidText}
             </p>
             {order.status !== 'cancelled' && (
               <button
@@ -113,10 +113,10 @@ export function OrderConfirmation({
                 disabled={retrying}
                 className="mt-4 inline-flex items-center gap-2 bg-ink hover:bg-ink/90 disabled:opacity-60 text-white text-sm font-semibold px-6 py-3 rounded-full transition-colors"
               >
-                💳 {t.confirmation.gopayRetry} · {formatCzk(order.totalCzk)}
+                💳 {t.confirmation.onlineRetry} · {formatCzk(order.totalCzk)}
               </button>
             )}
-            {retryError && <p className="mt-3 text-sm text-red-600">{t.checkout.gopayUnavailable}</p>}
+            {retryError && <p className="mt-3 text-sm text-red-600">{t.checkout.onlineUnavailable}</p>}
           </div>
         )
       ) : order.paymentMethod === 'cash_on_delivery' ? (

@@ -3,7 +3,7 @@ import { prisma } from '@/lib/db';
 import { isDeliveryDateValid, isDeliveryWindowValid } from '@/lib/delivery';
 import { findValidCoupon, calculateDiscount } from '@/lib/coupon';
 import { sendOrderEmails } from '@/lib/orderEmails';
-import { GOPAY_METHOD, isGopayEnabled, createGopayPayment } from '@/lib/gopay';
+import { ONLINE_METHOD, isOnlinePaymentEnabled, createOnlinePayment } from '@/lib/payments';
 
 interface OrderRequestBody {
   customerName: string;
@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
     const paymentMethod =
       body.paymentMethod === 'cash_on_delivery'
         ? 'cash_on_delivery'
-        : body.paymentMethod === GOPAY_METHOD && isGopayEnabled()
-          ? GOPAY_METHOD
+        : body.paymentMethod === ONLINE_METHOD && isOnlinePaymentEnabled()
+          ? ONLINE_METHOD
           : 'bank_transfer';
 
     const deliveryDate = new Date(body.deliveryDate);
@@ -173,11 +173,11 @@ export async function POST(request: NextRequest) {
       throw err;
     }
 
-    if (order.paymentMethod === GOPAY_METHOD) {
-      // Card / Google Pay: send the customer to GoPay. Emails go out only once
-      // GoPay confirms the payment (see /api/payments/gopay/notify + return).
+    if (order.paymentMethod === ONLINE_METHOD) {
+      // Card / Google Pay / Apple Pay: send the customer to the payment gateway (Comgate or
+      // GoPay). Emails go out only once the gateway confirms the payment (notify + return routes).
       try {
-        const redirectUrl = await createGopayPayment(
+        const redirectUrl = await createOnlinePayment(
           {
             id: order.id,
             orderNumber: order.orderNumber,
@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
         );
         return NextResponse.json({ orderId: order.id, redirectUrl });
       } catch (err) {
-        console.error('GoPay payment creation failed:', err);
+        console.error('Online payment creation failed:', err);
         // Undo: cancel the order and give the coupon use back, so the customer can retry another way.
         await prisma.order.update({ where: { id: order.id }, data: { status: 'cancelled' } });
         if (order.couponId) {
