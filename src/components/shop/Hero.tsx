@@ -30,6 +30,40 @@ export function Hero() {
         >
           {t.home.heroCta} 💐
         </Link>
+
+        <ul className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <li
+            className="hero-badge shine relative overflow-hidden inline-flex items-center gap-2 rounded-full bg-sage-light text-sage-dark border border-sage/30 px-4 py-2 text-sm font-semibold shadow-card"
+            style={{ animationDelay: '0.2s' }}
+          >
+            <svg
+              className="truck-drive"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z" />
+              <circle cx="7" cy="17.5" r="1.8" fill="white" />
+              <circle cx="17" cy="17.5" r="1.8" fill="white" />
+            </svg>
+            {t.home.freeDelivery}
+          </li>
+          <li
+            className="hero-badge shine relative overflow-hidden inline-flex items-center gap-2 rounded-full bg-white/80 text-brand-dark border border-brand/30 px-4 py-2 text-sm font-semibold shadow-card"
+            style={{ animationDelay: '0.45s' }}
+          >
+            <span className="coin-flip text-base leading-none" aria-hidden="true">
+              💵
+            </span>
+            {t.home.cashOnDelivery}
+          </li>
+        </ul>
       </div>
     </section>
   );

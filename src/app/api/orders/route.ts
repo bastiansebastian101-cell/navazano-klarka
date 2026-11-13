@@ -11,6 +11,7 @@ interface OrderRequestBody {
   deliveryAddress: string;
   deliveryDate: string; // ISO date
   deliveryWindow: string;
+  paymentMethod?: string;
   notes?: string;
   couponCode?: string;
   occasionReason?: string;
@@ -36,6 +37,9 @@ export async function POST(request: NextRequest) {
     if (!isDeliveryWindowValid(body.deliveryWindow)) {
       return NextResponse.json({ error: 'invalid_delivery_window' }, { status: 400 });
     }
+
+    // Only the payment methods we actually offer; anything else falls back to bank transfer.
+    const paymentMethod = body.paymentMethod === 'cash_on_delivery' ? 'cash_on_delivery' : 'bank_transfer';
 
     const deliveryDate = new Date(body.deliveryDate);
     if (Number.isNaN(deliveryDate.getTime()) || !isDeliveryDateValid(deliveryDate)) {
@@ -138,7 +142,7 @@ export async function POST(request: NextRequest) {
             deliveryAddress: body.deliveryAddress.trim(),
             deliveryDate,
             deliveryWindow: body.deliveryWindow,
-            paymentMethod: 'bank_transfer', // only payment method offered — never trust client input here
+            paymentMethod, // whitelisted above — never store raw client input
             notes: body.notes?.trim() || null,
             totalCzk,
             discountCzk,

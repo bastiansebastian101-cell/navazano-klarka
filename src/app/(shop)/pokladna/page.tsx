@@ -31,6 +31,7 @@ export default function CheckoutPage() {
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [deliveryDate, setDeliveryDate] = useState(minDate);
   const [deliveryWindow, setDeliveryWindow] = useState<DeliveryWindow>(DELIVERY_WINDOWS[0]);
+  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'cash_on_delivery'>('bank_transfer');
   const [notes, setNotes] = useState('');
   const [occasionReason, setOccasionReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -111,7 +112,7 @@ export default function CheckoutPage() {
           deliveryAddress,
           deliveryDate: new Date(deliveryDate).toISOString(),
           deliveryWindow,
-          paymentMethod: 'bank_transfer',
+          paymentMethod,
           notes,
           occasionReason,
           couponCode: appliedCoupon?.code,
@@ -219,7 +220,34 @@ export default function CheckoutPage() {
 
         <div>
           <h2 className="font-medium text-ink mb-3">{t.checkout.paymentMethod}</h2>
-          <p className="text-sm text-ink-light bg-brand-light rounded-lg px-4 py-2.5">{t.checkout.bankTransfer}</p>
+          <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label={t.checkout.paymentMethod}>
+            {(
+              [
+                { value: 'bank_transfer', label: t.checkout.bankTransfer, icon: '🏦' },
+                { value: 'cash_on_delivery', label: t.checkout.cashOnDelivery, icon: '💵' },
+              ] as const
+            ).map((opt) => (
+              <label
+                key={opt.value}
+                className={`flex items-center gap-3 cursor-pointer rounded-lg border px-4 py-2.5 text-sm transition-colors ${
+                  paymentMethod === opt.value
+                    ? 'border-brand bg-brand-light text-ink'
+                    : 'border-ink-lighter/30 text-ink-light hover:border-brand/50'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value={opt.value}
+                  checked={paymentMethod === opt.value}
+                  onChange={() => setPaymentMethod(opt.value)}
+                  className="accent-brand"
+                />
+                <span aria-hidden="true">{opt.icon}</span>
+                {opt.label}
+              </label>
+            ))}
+          </div>
         </div>
 
         <div>

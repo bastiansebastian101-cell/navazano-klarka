@@ -29,6 +29,83 @@
   }
 }
 
+/* ---- Hero badges: free delivery / cash on delivery ---- */
+.hero-badge {
+  opacity: 0;
+  animation: hero-badge-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+/* soft light sweep across the pill every few seconds */
+.shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.75) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: badge-shine 4.5s ease-in-out 1.2s infinite;
+  pointer-events: none;
+}
+.hero-badge:nth-child(2)::after {
+  animation-delay: 1.6s;
+}
+.truck-drive {
+  animation: truck-drive 2.4s ease-in-out infinite;
+}
+.coin-flip {
+  display: inline-block;
+  animation: coin-bob 2.4s ease-in-out 0.6s infinite;
+}
+@keyframes hero-badge-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes badge-shine {
+  0%,
+  60% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+@keyframes truck-drive {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  40% {
+    transform: translateX(3px) translateY(-1px);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+}
+@keyframes coin-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-2px) rotate(-8deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-badge {
+    opacity: 1;
+    animation: none;
+  }
+  .shine::after,
+  .truck-drive,
+  .coin-flip {
+    animation: none;
+  }
+}
+
 @keyframes marquee {
   from {
     transform: translateX(0);

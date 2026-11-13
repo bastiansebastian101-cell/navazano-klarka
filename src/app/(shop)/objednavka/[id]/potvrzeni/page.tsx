@@ -12,11 +12,14 @@ export default async function OrderConfirmationPage({ params }: { params: { id: 
   });
   if (!order) notFound();
 
-  const qrDataUrl = await generatePaymentQrDataUrl({
-    amountCzk: order.totalCzk,
-    variableSymbol: order.orderNumber,
-    message: `Objednavka ${order.orderNumber}`,
-  });
+  const qrDataUrl =
+    order.paymentMethod === 'bank_transfer'
+      ? await generatePaymentQrDataUrl({
+          amountCzk: order.totalCzk,
+          variableSymbol: order.orderNumber,
+          message: `Objednavka ${order.orderNumber}`,
+        })
+      : null;
 
   const iban = process.env.BANK_IBAN ? formatIbanForDisplay(process.env.BANK_IBAN) : null;
 

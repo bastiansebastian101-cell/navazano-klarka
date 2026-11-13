@@ -14,6 +14,8 @@ export const en: Translations = {
     heroTitle: 'Handmade bouquets, tied with love, in České Budějovice',
     heroSubtitle: 'Fresh flowers with delivery across České Budějovice, right to your door',
     heroCta: 'Browse the catalog',
+    freeDelivery: 'Free delivery',
+    cashOnDelivery: 'Cash on delivery',
     featured: 'Featured bouquets',
   },
   catalog: {
@@ -59,6 +61,7 @@ export const en: Translations = {
     windowEvening: '3:00 PM – 6:00 PM',
     paymentMethod: 'Payment method',
     bankTransfer: 'Bank transfer',
+    cashOnDelivery: 'Cash on delivery',
     notes: 'Order notes (optional)',
     occasionReason: 'What occasion is this bouquet for? (optional)',
     occasionReasonPlaceholder: "E.g. wife's birthday",
@@ -87,6 +90,7 @@ export const en: Translations = {
     qrPayment: 'QR payment',
     exactAmountWarning: 'ATTENTION! Please send the exact amount with the variable symbol shown. Otherwise the payment may only be processed after manual verification, possibly with a delay.',
     deliveryInfo: 'Delivery',
+    cashOnDeliveryInfo: 'You will pay in cash when your flowers are delivered. Amount to pay:',
     backHome: 'Back to homepage',
   },
   admin: {

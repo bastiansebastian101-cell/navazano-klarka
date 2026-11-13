@@ -12,6 +12,8 @@ export const cs = {
     heroTitle: 'Ručně vázané kytice s láskou v Českých Budějovicích',
     heroSubtitle: 'Čerstvé květiny s rozvozem po Českých Budějovicích až k vám domů',
     heroCta: 'Prohlédnout katalog',
+    freeDelivery: 'Doprava zdarma',
+    cashOnDelivery: 'Platba při převzetí',
     featured: 'Oblíbené kytice',
   },
   catalog: {
@@ -57,6 +59,7 @@ export const cs = {
     windowEvening: '15:00 – 18:00',
     paymentMethod: 'Způsob platby',
     bankTransfer: 'Bankovní převod',
+    cashOnDelivery: 'Hotově při převzetí',
     notes: 'Poznámka k objednávce (nepovinné)',
     occasionReason: 'K jaké příležitosti kytici kupujete? (nepovinné)',
     occasionReasonPlaceholder: 'Např. narozeniny manželky',
@@ -85,6 +88,7 @@ export const cs = {
     qrPayment: 'QR platba',
     exactAmountWarning: 'POZOR! Odešlete prosím přesnou částku s uvedeným variabilním symbolem. Platba bude jinak zpracována až po ověření, případně s prodlením.',
     deliveryInfo: 'Doručení',
+    cashOnDeliveryInfo: 'Zaplatíte hotově při převzetí kytice. Částka k úhradě:',
     backHome: 'Zpět na hlavní stránku',
   },
   admin: {
