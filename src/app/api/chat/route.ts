@@ -8,6 +8,7 @@ import {
   createConversation,
   getConversation,
   messagesAfter,
+  previousVisitorMessageAt,
   setMessageWaId,
   type ChatLang,
 } from '@/lib/chat/store';
@@ -20,13 +21,13 @@ const BOT = {
     offlineReply:
       "Děkujeme za zprávu! 🌸 Nejrychleji vám odpovíme na WhatsAppu: klepněte na zelené tlačítko níže. Nebo nám sem napište svůj telefon či e-mail a Klára se vám ozve co nejdříve.",
     firstReply:
-      'Děkujeme za zprávu! 🌸 Klára vám odpoví přímo tady v chatu, obvykle během pár minut. Pokud budete muset odejít, napište nám prosím telefon nebo e-mail a ozveme se.',
+      'Děkujeme za zprávu! 🌸 Klára vám odpoví přímo tady v chatu, obvykle během pár minut. Pokud budete muset odejít, nechte nám tu telefon nebo e-mail, nebo nám napište na WhatsApp (zelené tlačítko).',
   },
   en: {
     offlineReply:
       "Thanks for your message! 🌸 The fastest way to get an answer is WhatsApp: tap the green button below. Or write your phone number or e-mail here and Klára will contact you as soon as possible.",
     firstReply:
-      "Thanks for your message! 🌸 Klára will reply right here in this chat, usually within a few minutes. If you need to leave, please write your phone or e-mail and we'll get back to you.",
+      "Thanks for your message! 🌸 Klára will reply right here in this chat, usually within a few minutes. If you need to leave, leave your phone or e-mail here, or message us on WhatsApp (green button).",
   },
 };
 
@@ -91,14 +92,20 @@ export async function POST(req: NextRequest) {
         delivered = true;
       }
     }
+    // E-mail alert with a link to the admin inbox: for the first message of a chat, and again only
+    // if the customer writes after a 10-minute pause (so a conversation doesn't send one e-mail per line).
     if (!delivered) {
-      await emailOwner(
-        `💬 Nová zpráva z chatu na webu (#${conv.code})`,
-        `${label}\n\n${text}\n\n(Odpověď z WhatsAppu se v chatu zobrazí jen když je WhatsApp propojený. Jinak kontaktujte zákazníka, pokud v chatu nechal telefon nebo e-mail.)`
-      );
+      const prev = isFirst ? null : await previousVisitorMessageAt(conv.id, msgId);
+      if (isFirst || !prev || Date.now() - new Date(prev).getTime() > 10 * 60 * 1000) {
+        const base = process.env.NEXT_PUBLIC_APP_URL || 'https://navazano.cz';
+        await emailOwner(
+          `💬 Nová zpráva v chatu na webu (#${conv.code})`,
+          `${label}\n\n${text}\n\nOdpovězte tady: ${base}/admin/chat?c=${conv.code}\n(Odpověď se zákazníkovi zobrazí přímo v chatu na webu.)`
+        );
+      }
     }
-    // Replies can only appear in the chat when WhatsApp is connected; otherwise ask for a phone/e-mail.
-    if (isFirst) await addMessage(conv.id, 'bot', delivered && isWhatsAppEnabled() ? BOT[conv.lang].firstReply : BOT[conv.lang].offlineReply);
+    // Replies from the admin inbox (or WhatsApp, when connected) appear right in the customer's chat.
+    if (isFirst) await addMessage(conv.id, 'bot', BOT[conv.lang].firstReply);
     return NextResponse.json({ ok: true });
   }
 

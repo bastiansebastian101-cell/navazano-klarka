@@ -22,6 +22,12 @@ export function AdminNav() {
         <span className="font-display text-lg text-brand">Navázáno — Admin</span>
         <nav className="flex items-center gap-6">
           <Link
+            href="/admin/chat"
+            className={`text-sm font-medium ${pathname.startsWith('/admin/chat') ? 'text-brand' : 'text-ink hover:text-brand'}`}
+          >
+            💬 Chat
+          </Link>
+          <Link
             href="/admin/objednavky"
             className={`text-sm font-medium ${pathname.startsWith('/admin/objednavky') ? 'text-brand' : 'text-ink hover:text-brand'}`}
           >

@@ -23,7 +23,47 @@ async function ensureTables() {
   );
   await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "ChatMessage_conv_idx" ON "ChatMessage" ("conversationId", "id")`);
   await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "ChatMessage_wa_idx" ON "ChatMessage" ("waId")`);
+  // last message id the shop has seen in the admin inbox (for unread counts)
+  await prisma.$executeRawUnsafe(`ALTER TABLE "ChatConversation" ADD COLUMN IF NOT EXISTS "ownerSeenId" INTEGER NOT NULL DEFAULT 0`);
   ready = true;
+}
+
+// ----- Admin inbox -----
+export type InboxRow = {
+  id: string;
+  code: string;
+  lang: ChatLang;
+  lastActivity: Date;
+  lastText: string | null;
+  lastSender: ChatSender | null;
+  unread: number;
+};
+
+/** Conversations that have at least one customer message, newest first, with unread counts. */
+export async function listConversations(limit = 100): Promise<InboxRow[]> {
+  await ensureTables();
+  return prisma.$queryRaw<InboxRow[]>`
+    SELECT c."id", c."code", c."lang", c."lastActivity",
+      (SELECT m."text" FROM "ChatMessage" m WHERE m."conversationId" = c."id" AND m."sender" <> 'bot' ORDER BY m."id" DESC LIMIT 1) AS "lastText",
+      (SELECT m."sender" FROM "ChatMessage" m WHERE m."conversationId" = c."id" AND m."sender" <> 'bot' ORDER BY m."id" DESC LIMIT 1) AS "lastSender",
+      (SELECT COUNT(*)::int FROM "ChatMessage" m WHERE m."conversationId" = c."id" AND m."sender" = 'visitor' AND m."id" > c."ownerSeenId") AS "unread"
+    FROM "ChatConversation" c
+    WHERE EXISTS (SELECT 1 FROM "ChatMessage" m WHERE m."conversationId" = c."id" AND m."sender" = 'visitor')
+    ORDER BY c."lastActivity" DESC LIMIT ${limit}`;
+}
+
+export async function markSeen(conversationId: string) {
+  await prisma.$executeRaw`
+    UPDATE "ChatConversation" SET "ownerSeenId" = COALESCE((SELECT MAX("id") FROM "ChatMessage" WHERE "conversationId" = ${conversationId}), 0)
+    WHERE "id" = ${conversationId}`;
+}
+
+/** When the customer wrote before this message (to avoid one e-mail per message). */
+export async function previousVisitorMessageAt(conversationId: string, beforeId: number): Promise<Date | null> {
+  const rows = await prisma.$queryRaw<{ createdAt: Date }[]>`
+    SELECT "createdAt" FROM "ChatMessage" WHERE "conversationId" = ${conversationId} AND "sender" = 'visitor' AND "id" < ${beforeId}
+    ORDER BY "id" DESC LIMIT 1`;
+  return rows[0]?.createdAt ?? null;
 }
 
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I
