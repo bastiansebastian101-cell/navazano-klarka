@@ -17,10 +17,14 @@ export const dynamic = 'force-dynamic';
 
 const BOT = {
   cs: {
+    offlineReply:
+      "Děkujeme za zprávu! 🌸 Abychom vám mohli odpovědět, napište nám prosím sem do chatu svůj telefon nebo e-mail. Klára se vám ozve co nejdříve.",
     firstReply:
       'Děkujeme za zprávu! 🌸 Klára vám odpoví přímo tady v chatu, obvykle během pár minut. Pokud budete muset odejít, napište nám prosím telefon nebo e-mail a ozveme se.',
   },
   en: {
+    offlineReply:
+      "Thanks for your message! 🌸 So we can get back to you, please write your phone number or e-mail here in the chat. Klára will contact you as soon as possible.",
     firstReply:
       "Thanks for your message! 🌸 Klára will reply right here in this chat, usually within a few minutes. If you need to leave, please write your phone or e-mail and we'll get back to you.",
   },
@@ -93,7 +97,8 @@ export async function POST(req: NextRequest) {
         `${label}\n\n${text}\n\n(Odpověď z WhatsAppu se v chatu zobrazí jen když je WhatsApp propojený. Jinak kontaktujte zákazníka, pokud v chatu nechal telefon nebo e-mail.)`
       );
     }
-    if (isFirst) await addMessage(conv.id, 'bot', BOT[conv.lang].firstReply);
+    // Replies can only appear in the chat when WhatsApp is connected; otherwise ask for a phone/e-mail.
+    if (isFirst) await addMessage(conv.id, 'bot', delivered && isWhatsAppEnabled() ? BOT[conv.lang].firstReply : BOT[conv.lang].offlineReply);
     return NextResponse.json({ ok: true });
   }
 
