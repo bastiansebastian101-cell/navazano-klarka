@@ -3,6 +3,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Popups } from '@/components/shop/Popups';
 import { DeliveryCountdownBar } from '@/components/shop/DeliveryCountdownBar';
 import { PromoBar } from '@/components/shop/PromoBar';
+import { ChatWidget } from '@/components/shop/ChatWidget';
 
 export default function ShopLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -13,6 +14,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
       <main className="flex-1">{children}</main>
       <Footer />
       <Popups />
+      <ChatWidget />
     </div>
   );
 }
