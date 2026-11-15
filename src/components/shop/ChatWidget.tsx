@@ -20,6 +20,9 @@ const T = {
     error: 'Zprávu se nepodařilo odeslat. Zkuste to prosím znovu.',
     close: 'Zavřít chat',
     switchLang: 'English',
+    waFaster: '💬 Rychlejší odpověď? Napište nám na WhatsApp',
+    waHeader: 'Napsat na WhatsApp',
+    waIntro: 'Dobrý den, píšu z webu navazano.cz.',
   },
   en: {
     fab: 'Chat with us',
@@ -32,8 +35,15 @@ const T = {
     error: "The message couldn't be sent. Please try again.",
     close: 'Close chat',
     switchLang: 'Česky',
+    waFaster: '💬 Faster reply? Message us on WhatsApp',
+    waHeader: 'Message on WhatsApp',
+    waIntro: "Hello, I'm writing from navazano.cz.",
   },
 };
+
+// Shop WhatsApp: questions the chat can't handle are sent here (opens WhatsApp with the text typed in).
+const WHATSAPP = '420728415630';
+const waLink = (text: string) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
 
 const STORE_KEY = 'navazano_chat';
 type Saved = { lang?: Lang; id?: string; lastId?: number; seen?: number };
@@ -186,6 +196,18 @@ export function ChatWidget() {
                 {t.switchLang}
               </button>
             )}
+            <a
+              href={waLink(T[lang ?? 'cs'].waIntro)}
+              target="_blank"
+              rel="noopener"
+              aria-label={t.waHeader}
+              title={t.waHeader}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-[#25D366] text-white"
+            >
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
+                <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.1z" />
+              </svg>
+            </a>
             <button onClick={() => setOpen(false)} aria-label={t.close} className="px-1 text-2xl leading-none">
               ×
             </button>
@@ -217,6 +239,23 @@ export function ChatWidget() {
                     {m.text}
                   </Bubble>
                 ))}
+                {/* after the customer has written, offer WhatsApp with their question already typed */}
+                {msgs.some((m) => m.sender === 'visitor' || m.sender === 'local') && (
+                  <a
+                    href={waLink(
+                      `${t.waIntro}\n\n${msgs
+                        .filter((m) => m.sender === 'visitor' || m.sender === 'local')
+                        .map((m) => m.text)
+                        .slice(-3)
+                        .join('\n')}`
+                    )}
+                    target="_blank"
+                    rel="noopener"
+                    className="mt-1 self-start rounded-full bg-[#25D366] px-4 py-2 text-sm font-semibold text-white shadow-card hover:brightness-95"
+                  >
+                    {t.waFaster}
+                  </a>
+                )}
               </>
             )}
           </div>

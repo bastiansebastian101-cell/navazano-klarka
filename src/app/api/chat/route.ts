@@ -18,13 +18,13 @@ export const dynamic = 'force-dynamic';
 const BOT = {
   cs: {
     offlineReply:
-      "Děkujeme za zprávu! 🌸 Abychom vám mohli odpovědět, napište nám prosím sem do chatu svůj telefon nebo e-mail. Klára se vám ozve co nejdříve.",
+      "Děkujeme za zprávu! 🌸 Nejrychleji vám odpovíme na WhatsAppu: klepněte na zelené tlačítko níže. Nebo nám sem napište svůj telefon či e-mail a Klára se vám ozve co nejdříve.",
     firstReply:
       'Děkujeme za zprávu! 🌸 Klára vám odpoví přímo tady v chatu, obvykle během pár minut. Pokud budete muset odejít, napište nám prosím telefon nebo e-mail a ozveme se.',
   },
   en: {
     offlineReply:
-      "Thanks for your message! 🌸 So we can get back to you, please write your phone number or e-mail here in the chat. Klára will contact you as soon as possible.",
+      "Thanks for your message! 🌸 The fastest way to get an answer is WhatsApp: tap the green button below. Or write your phone number or e-mail here and Klára will contact you as soon as possible.",
     firstReply:
       "Thanks for your message! 🌸 Klára will reply right here in this chat, usually within a few minutes. If you need to leave, please write your phone or e-mail and we'll get back to you.",
   },
