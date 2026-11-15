@@ -1,8 +1,6 @@
 'use client';
 
-import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { SELLER, SELLER_ADDRESS } from '@/lib/seller';
 
 export function Footer() {
   const { t } = useLanguage();
@@ -39,29 +37,6 @@ export function Footer() {
         </div>
         <p className="text-sm text-ink-light">
           © {new Date().getFullYear()} Navázáno by Klára. {t.footer.rights}
-        </p>
-      </div>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-6 space-y-2 text-center sm:text-left">
-        <p className="text-xs text-ink-lighter">{t.footer.deliveryArea}</p>
-        <p className="text-xs text-ink-light">
-          {t.footer.operator}: {SELLER.legalName}, IČO {SELLER.ico}, {SELLER_ADDRESS}
-          {!SELLER.vatPayer && ` · ${t.footer.notVatPayer}`} ·{' '}
-          <a href={`mailto:${SELLER.email}`} className="hover:text-brand">
-            {SELLER.email}
-          </a>{' '}
-          ·{' '}
-          <a href={`tel:${SELLER.phone.replace(/\s/g, '')}`} className="hover:text-brand">
-            {SELLER.phone}
-          </a>
-        </p>
-        <p className="text-xs">
-          <Link href="/obchodni-podminky" className="text-ink-light underline hover:text-brand">
-            {t.footer.terms}
-          </Link>
-          {' · '}
-          <Link href="/ochrana-osobnich-udaju" className="text-ink-light underline hover:text-brand">
-            {t.footer.privacy}
-          </Link>
         </p>
       </div>
     </footer>
