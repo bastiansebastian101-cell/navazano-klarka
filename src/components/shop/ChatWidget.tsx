@@ -162,7 +162,7 @@ export function ChatWidget() {
   const t = T[lang ?? 'cs'];
 
   return (
-    <div className={`fixed ${open ? 'z-[70] inset-0 sm:inset-auto sm:bottom-5 sm:right-5' : 'z-30 bottom-5 right-4 sm:right-5'}`}>
+    <div className={`fixed ${open ? 'z-[70] inset-0 sm:inset-auto sm:bottom-5 sm:right-5' : 'z-30 bottom-[5.5rem] right-6'}`}>
       {!open && (
         <button
           onClick={() => setOpen(true)}
