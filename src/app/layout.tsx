@@ -5,6 +5,7 @@ import './globals.css';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { CartProvider } from '@/contexts/CartContext';
 import { SELLER } from '@/lib/seller';
+import { GoogleAdsTag } from '@/components/analytics/GoogleAdsTag';
 
 const inter = Inter({
   subsets: ['latin', 'latin-ext'],
@@ -87,6 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </LanguageProvider>
       </body>
       {gaId && <GoogleAnalytics gaId={gaId} />}
+      <GoogleAdsTag />
     </html>
   );
 }
