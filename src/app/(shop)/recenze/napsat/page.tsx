@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { GOOGLE_REVIEW_URL } from '@/lib/googleReview';
 
 function StarRating({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   return (
@@ -90,6 +91,15 @@ function ReviewForm() {
         <p className="text-4xl mb-3">🌸</p>
         <h1 className="font-display text-2xl text-ink mb-2">{t.reviewForm.successTitle}</h1>
         <p className="text-ink-light text-sm">{t.reviewForm.successMessage}</p>
+        <p className="text-ink text-sm mt-8">{t.reviewForm.googlePrompt}</p>
+        <a
+          href={GOOGLE_REVIEW_URL}
+          target="_blank"
+          rel="noopener"
+          className="inline-block mt-4 bg-[#B8567A] hover:bg-[#A44A6C] text-white text-sm font-semibold px-7 py-3 rounded-full transition-colors"
+        >
+          {t.reviewForm.googleButton}
+        </a>
       </div>
     );
   }

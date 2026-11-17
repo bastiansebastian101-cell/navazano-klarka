@@ -3,6 +3,7 @@ import { formatCzk } from './format';
 import { DELIVERY_WINDOW_LABELS_CS } from './delivery-labels';
 import { paymentLabelCs } from './paymentLabels';
 import { generatePaymentQrAsset, formatIbanForDisplay } from './payment';
+import { GOOGLE_REVIEW_URL } from '@/lib/googleReview';
 
 let _resend: Resend | null = null;
 
@@ -400,6 +401,8 @@ export async function sendReviewInviteEmail(email: string, customerName: string,
         <h2 style="color:#111;margin-bottom:8px;">Děkujeme za objednávku, ${name}!</h2>
         <p style="color:#111;font-size:14px;line-height:1.6;">Doufáme, že máte z kytice radost. Bude nám velkou poctou, když nám o své zkušenosti napíšete pár slov — pomůže nám to i dalším zákazníkům.</p>
         <a href="${reviewUrl}" style="display:inline-block;margin-top:20px;background:#F582B3;color:#fff;text-decoration:none;font-weight:600;padding:12px 28px;border-radius:999px;">Napsat recenzi</a>
+        <p style="color:#111;font-size:14px;line-height:1.6;margin-top:28px;">Máte chvilku navíc? Recenze na Googlu nám moc pomůže, aby nás našli i další milovníci květin.</p>
+        <a href="${GOOGLE_REVIEW_URL}" target="_blank" rel="noopener" style="display:inline-block;margin-top:12px;background:#B8567A;color:#fff;text-decoration:none;font-weight:600;padding:14px 30px;border-radius:999px;font-size:15px;">⭐ Napište nám recenzi na Google</a>
         <p style="color:#999;font-size:12px;margin-top:32px;">Navázáno by Klára</p>
       </div>
     `,
