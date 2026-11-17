@@ -6,6 +6,7 @@ import type { Prisma } from '@prisma/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatCzk } from '@/lib/format';
 import { DELIVERY_WINDOW_LABELS_CS } from '@/lib/delivery-labels';
+import { PurchaseConversion } from '@/components/analytics/PurchaseConversion';
 
 type OrderWithItems = Prisma.OrderGetPayload<{ include: { items: { include: { product: true } } } }>;
 
@@ -54,6 +55,7 @@ export function OrderConfirmation({
 
   return (
     <div className="text-center">
+      <PurchaseConversion orderNumber={order.orderNumber} valueCzk={order.totalCzk} />
       <div className="text-5xl mb-4">💐</div>
       <h1 className="font-display text-3xl text-ink">{t.confirmation.title}</h1>
       <p className="mt-2 text-ink-light">
