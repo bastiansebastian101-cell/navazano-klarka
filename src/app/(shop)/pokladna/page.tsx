@@ -26,13 +26,19 @@ export default function CheckoutPage() {
   const { items, totalCzk, clear } = useCart();
   const router = useRouter();
 
-  const minDate = useMemo(() => toDateInputValue(earliestDeliveryDate()), []);
+  // Pre-order items in the cart (e.g. Christmas bouquets) push the earliest date out.
+  const prepDays = items.reduce((max, i) => Math.max(max, i.prepDays ?? 0), 0);
+  const minDate = useMemo(() => toDateInputValue(earliestDeliveryDate(new Date(), prepDays)), [prepDays]);
 
   const [customerName, setCustomerName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [deliveryDate, setDeliveryDate] = useState(minDate);
+  // The cart loads from storage after the first render — keep the picked date valid.
+  useEffect(() => {
+    setDeliveryDate((d) => (d < minDate ? minDate : d));
+  }, [minDate]);
   const [deliveryWindow, setDeliveryWindow] = useState<DeliveryWindow>(DELIVERY_WINDOWS[0]);
   const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'cash_on_delivery' | 'card'>('bank_transfer');
   // Card / Google Pay / Apple Pay is offered only when a payment gateway is configured.

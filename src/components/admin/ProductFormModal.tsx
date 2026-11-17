@@ -39,6 +39,7 @@ export function ProductFormModal({
   const [uploadingSlot, setUploadingSlot] = useState<number | null>(null);
   const [active, setActive] = useState(product?.active ?? true);
   const [featuredOnHome, setFeaturedOnHome] = useState(product?.featuredOnHome ?? false);
+  const [prepDays, setPrepDays] = useState(product?.prepDays ?? 0);
   const [variants, setVariants] = useState<VariantRow[]>(
     () =>
       product?.variants.map((v) => ({ id: v.id, label: v.label, priceCzk: String(Math.round(v.priceCzk / 100)) })) ??
@@ -88,6 +89,7 @@ export function ProductFormModal({
       imageUrls: imageSlots.filter((url): url is string => url !== null),
       active,
       featuredOnHome,
+      prepDays,
       variants: variants
         .filter((v) => v.label.trim() !== '' && v.priceCzk.trim() !== '')
         .map((v) => ({ id: v.id, label: v.label.trim(), priceCzk: Math.round((parseFloat(v.priceCzk) || 0) * 100) })),
@@ -178,6 +180,18 @@ export function ProductFormModal({
                 ))}
               </datalist>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm text-ink-light mb-1">{t.admin.prepDays}</label>
+            <input
+              type="number"
+              min={0}
+              max={60}
+              value={prepDays}
+              onChange={(e) => setPrepDays(Math.min(60, Math.max(0, parseInt(e.target.value, 10) || 0)))}
+              className="w-full border border-ink-lighter/30 rounded-lg px-4 py-2.5"
+            />
           </div>
 
           <div>

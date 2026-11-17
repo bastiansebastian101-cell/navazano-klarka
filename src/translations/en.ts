@@ -80,6 +80,8 @@ export const en: Translations = {
     share: 'Share',
     linkCopied: 'Link copied!',
     chooseVariant: 'Choose a variant',
+    preorderTitle: 'Pre-order only',
+    preorderText: 'We prepare this bouquet {days} days in advance. Earliest delivery: {date}.',
   },
   cart: {
     title: 'Cart',
@@ -172,6 +174,7 @@ export const en: Translations = {
     priceCzk: 'Price (Kč)',
     category: 'Category',
     categoryPlaceholder: 'E.g. Bouquets, Plants, Gifts',
+    prepDays: 'Preparation time (days, 0 = normal delivery)',
     image: 'Photo',
     uploadImage: 'Upload photo',
     upTo3Photos: 'up to 3 photos',

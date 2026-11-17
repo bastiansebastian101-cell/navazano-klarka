@@ -58,6 +58,7 @@ export function ProductCard({ product }: { product: ProductWithVariants }) {
                 nameEn: product.nameEn,
                 priceCzk: product.priceCzk,
                 imageUrl: product.imageUrls[0] ?? null,
+                prepDays: product.prepDays,
               })
             }
             className="mt-4 w-full bg-brand hover:bg-brand-hover text-white text-sm font-semibold py-2.5 rounded-full transition-colors"

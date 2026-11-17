@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
       imageUrls,
       active: body.active ?? true,
       featuredOnHome: body.featuredOnHome ?? false,
+      prepDays: Number.isInteger(body.prepDays) && body.prepDays >= 0 && body.prepDays <= 60 ? body.prepDays : 0,
       variants: {
         create: variants.map((v, i) => ({ label: v.label, priceCzk: v.priceCzk, sortOrder: i })),
       },

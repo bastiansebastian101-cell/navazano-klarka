@@ -29,15 +29,17 @@ function startOfDay(d: Date): Date {
 
 // Earliest date a delivery can be scheduled for, given when the order is placed.
 // "Today" and the cutoff hour are both taken in Czech time.
-export function earliestDeliveryDate(now: Date = new Date()): Date {
+// prepDays: preparation time of the slowest item in the order (pre-order
+// products such as Christmas bouquets); 0 = normal next-day delivery.
+export function earliestDeliveryDate(now: Date = new Date(), prepDays: number = 0): Date {
   const { year, month, day, hour } = pragueParts(now);
-  const daysAhead = hour < ORDER_CUTOFF_HOUR ? 1 : 2;
+  const daysAhead = Math.max(1, prepDays) + (hour < ORDER_CUTOFF_HOUR ? 0 : 1);
   return new Date(year, month, day + daysAhead);
 }
 
 // Re-validated server-side on every order — never trust a client-picked date.
-export function isDeliveryDateValid(deliveryDate: Date, now: Date = new Date()): boolean {
-  return startOfDay(deliveryDate).getTime() >= earliestDeliveryDate(now).getTime();
+export function isDeliveryDateValid(deliveryDate: Date, now: Date = new Date(), prepDays: number = 0): boolean {
+  return startOfDay(deliveryDate).getTime() >= earliestDeliveryDate(now, prepDays).getTime();
 }
 
 export function isDeliveryWindowValid(window: string): window is DeliveryWindow {

@@ -53,11 +53,6 @@ export async function POST(request: NextRequest) {
           ? ONLINE_METHOD
           : 'bank_transfer';
 
-    const deliveryDate = new Date(body.deliveryDate);
-    if (Number.isNaN(deliveryDate.getTime()) || !isDeliveryDateValid(deliveryDate)) {
-      return NextResponse.json({ error: 'invalid_delivery_date' }, { status: 400 });
-    }
-
     // Never trust client-submitted prices — look products (and any selected
     // variant) up fresh and price the order server-side from what's actually
     // active in the catalog.
@@ -67,6 +62,13 @@ export async function POST(request: NextRequest) {
       include: { variants: true },
     });
     const productMap = new Map(products.map((p) => [p.id, p]));
+
+    // Pre-order items (prepDays > 0) push the earliest delivery date out.
+    const prepDays = products.reduce((max, p) => Math.max(max, p.prepDays), 0);
+    const deliveryDate = new Date(body.deliveryDate);
+    if (Number.isNaN(deliveryDate.getTime()) || !isDeliveryDateValid(deliveryDate, new Date(), prepDays)) {
+      return NextResponse.json({ error: 'invalid_delivery_date' }, { status: 400 });
+    }
 
     const orderItems: { productId: string; variantId: string | null; variantLabel: string | null; quantity: number; priceCzk: number }[] = [];
     for (const item of body.items) {

@@ -19,6 +19,7 @@ model Product {
   imageUrls     String[] @default([]) // up to 3 photos
   active        Boolean  @default(true)
   featuredOnHome Boolean @default(false) // admin-controlled: shown on homepage featured section instead of only the 3 newest
+  prepDays      Int      @default(0) // pre-order items (e.g. Christmas bouquets): earliest delivery is this many days after ordering
   createdAt     DateTime @default(now())
 
   orderItems OrderItem[]

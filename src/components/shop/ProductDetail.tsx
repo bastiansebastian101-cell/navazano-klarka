@@ -8,6 +8,7 @@ import { useCart } from '@/contexts/CartContext';
 import { formatCzk } from '@/lib/format';
 import { ImageGallery } from '@/components/shop/ImageGallery';
 import { ShareButton } from '@/components/shop/ShareButton';
+import { earliestDeliveryDate } from '@/lib/delivery';
 
 type ProductWithVariants = Product & { variants: ProductVariant[] };
 
@@ -38,6 +39,22 @@ export function ProductDetail({ product }: { product: ProductWithVariants }) {
             <ShareButton productId={product.id} variant="labeled" className="mt-1 shrink-0 inline-flex items-center gap-2 text-sm font-semibold text-ink-light hover:text-brand transition-colors" />
           </div>
           <p className="mt-2 text-2xl text-brand font-semibold">{formatCzk(displayPriceCzk)}</p>
+          {product.prepDays > 0 && (
+            <div className="mt-4 rounded-xl border border-brand/30 bg-brand-light px-4 py-3 text-sm text-ink">
+              <p className="font-semibold">🎄 {t.product.preorderTitle}</p>
+              <p className="mt-1 text-ink-light">
+                {t.product.preorderText
+                  .replace('{days}', String(product.prepDays))
+                  .replace(
+                    '{date}',
+                    earliestDeliveryDate(new Date(), product.prepDays).toLocaleDateString(language === 'cs' ? 'cs-CZ' : 'en-GB', {
+                      day: 'numeric',
+                      month: 'long',
+                    })
+                  )}
+              </p>
+            </div>
+          )}
           <p className="mt-6 text-ink-light leading-relaxed">{description}</p>
 
           {activeVariants.length > 0 && (
@@ -72,6 +89,7 @@ export function ProductDetail({ product }: { product: ProductWithVariants }) {
                 nameEn: product.nameEn,
                 priceCzk: displayPriceCzk,
                 imageUrl: product.imageUrls[0] ?? null,
+                prepDays: product.prepDays,
               })
             }
             className="mt-8 w-full sm:w-auto bg-brand hover:bg-brand-hover text-white font-semibold px-8 py-3 rounded-full transition-colors"

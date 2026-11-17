@@ -43,6 +43,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   }
   if (typeof body.active === 'boolean') data.active = body.active;
   if (typeof body.featuredOnHome === 'boolean') data.featuredOnHome = body.featuredOnHome;
+  if (Number.isInteger(body.prepDays) && body.prepDays >= 0 && body.prepDays <= 60) data.prepDays = body.prepDays;
 
   const product = await prisma.$transaction(async (tx) => {
     await tx.product.update({ where: { id: params.id }, data });

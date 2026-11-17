@@ -11,6 +11,8 @@ export interface CartItem {
   priceCzk: number;
   imageUrl: string | null;
   quantity: number;
+  /** Pre-order preparation days (0 / missing = normal next-day delivery). */
+  prepDays?: number;
 }
 
 // Two different variants of the same product are separate cart lines —

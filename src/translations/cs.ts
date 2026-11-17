@@ -78,6 +78,8 @@ export const cs = {
     share: 'Sdílet',
     linkCopied: 'Odkaz zkopírován!',
     chooseVariant: 'Vyberte variantu',
+    preorderTitle: 'Pouze na předobjednávku',
+    preorderText: 'Kytici připravujeme {days} dny předem. Nejdříve doručíme {date}.',
   },
   cart: {
     title: 'Košík',
@@ -170,6 +172,7 @@ export const cs = {
     priceCzk: 'Cena (Kč)',
     category: 'Kategorie',
     categoryPlaceholder: 'Např. Kytice, Rostliny, Dárky',
+    prepDays: 'Doba přípravy (dny, 0 = běžné doručení)',
     image: 'Fotka',
     uploadImage: 'Nahrát fotku',
     upTo3Photos: 'max. 3 fotky',
