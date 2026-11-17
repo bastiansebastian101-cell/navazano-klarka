@@ -370,6 +370,8 @@ export const en: Translations = {
     expiredToken: 'This review link has expired.',
     alreadyUsed: "You've already submitted this review. Thank you!",
     genericError: 'Something went wrong. Please try again.',
+    googlePrompt: 'Thank you! Would you help us even more with a Google review?',
+    googleButton: '⭐ Write us a review on Google',
   },
   reviews: {
     title: 'What our customers say',

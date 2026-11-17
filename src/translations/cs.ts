@@ -368,6 +368,8 @@ export const cs = {
     expiredToken: 'Platnost odkazu na recenzi vypršela.',
     alreadyUsed: 'Tuto recenzi jste již odeslali. Děkujeme!',
     genericError: 'Něco se nepovedlo. Zkuste to prosím znovu.',
+    googlePrompt: 'Děkujeme! Pomůžete nám ještě víc recenzí na Google?',
+    googleButton: '⭐ Napište nám recenzi na Google',
   },
   reviews: {
     title: 'Co o nás říkají zákazníci',
