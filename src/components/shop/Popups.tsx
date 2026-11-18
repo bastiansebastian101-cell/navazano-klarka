@@ -34,6 +34,8 @@ function markPopupSeen() {
 
 // The subscription video only opens once the visitor has spent this long on the site.
 const VIDEO_DELAY_MS = 60_000;
+// The custom-bouquet popup (office page) opens this long after the visitor arrived on the site.
+const BOUQUET_DELAY_MS = 35_000;
 // When this visit started — kept for the browser tab, so page changes and reloads don't restart the minute.
 const VISIT_START_KEY = 'navazano_visit_start';
 
@@ -57,6 +59,7 @@ export function Popups() {
   const [autoPopup, setAutoPopup] = useState<AutoPopup>(null);
   // True once the visitor has been on the site for VIDEO_DELAY_MS.
   const [videoReady, setVideoReady] = useState(false);
+  const [bouquetDelayMs, setBouquetDelayMs] = useState(BOUQUET_DELAY_MS);
 
   useEffect(() => {
     const remaining = visitStart() + VIDEO_DELAY_MS - Date.now();
@@ -72,9 +75,10 @@ export function Popups() {
     if (blocked || autoPopup || hasSeenPopup()) return;
     const next: AutoPopup = pathname === '/kancelare' ? 'bouquet' : 'video';
     if (next === 'video' && !videoReady) return;
+    if (next === 'bouquet') setBouquetDelayMs(Math.max(0, visitStart() + BOUQUET_DELAY_MS - Date.now()));
     setAutoPopup(next);
     // The video counts as seen as soon as it opens.
-    // The bouquet popup waits 5 s and is marked seen when it actually opens.
+    // The bouquet popup is marked seen when it actually opens.
     if (next === 'video') markPopupSeen();
   }, [blocked, pathname, autoPopup, videoReady]);
 
@@ -91,6 +95,7 @@ export function Popups() {
       {autoPopup === 'video' && <VideoPopup onClose={finishAutoPopup} />}
       <CustomBouquetPopup
         autoOpen={autoPopup === 'bouquet'}
+        autoOpenDelayMs={bouquetDelayMs}
         onAutoOpen={finishAutoPopup}
         onClose={finishAutoPopup}
       />

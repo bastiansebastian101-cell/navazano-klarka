@@ -13,11 +13,13 @@ function toDateInputValue(d: Date): string {
 type CustomBouquetPopupProps = {
   /** Open automatically after 5 s (only for a visitor who hasn't seen a popup yet). */
   autoOpen?: boolean;
+  /** How long to wait before the automatic open (default 5 s). */
+  autoOpenDelayMs?: number;
   onAutoOpen?: () => void;
   onClose?: () => void;
 };
 
-export function CustomBouquetPopup({ autoOpen = false, onAutoOpen, onClose }: CustomBouquetPopupProps) {
+export function CustomBouquetPopup({ autoOpen = false, autoOpenDelayMs = 5000, onAutoOpen, onClose }: CustomBouquetPopupProps) {
   const { t } = useLanguage();
   const minDate = useMemo(() => toDateInputValue(earliestDeliveryDate()), []);
   const [open, setOpen] = useState(false);
@@ -39,9 +41,9 @@ export function CustomBouquetPopup({ autoOpen = false, onAutoOpen, onClose }: Cu
     const timer = setTimeout(() => {
       setOpen(true);
       onAutoOpen?.();
-    }, 5000);
+    }, autoOpenDelayMs);
     return () => clearTimeout(timer);
-  }, [autoOpen, onAutoOpen]);
+  }, [autoOpen, autoOpenDelayMs, onAutoOpen]);
 
   const handleClose = () => {
     setOpen(false);
