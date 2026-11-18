@@ -11,15 +11,15 @@ function toDateInputValue(d: Date): string {
 }
 
 type CustomBouquetPopupProps = {
-  /** Open automatically after 5 s (only for a visitor who hasn't seen a popup yet). */
+  /** Open now (the timing is decided by Popups). */
   autoOpen?: boolean;
-  /** How long to wait before the automatic open (default 5 s). */
-  autoOpenDelayMs?: number;
   onAutoOpen?: () => void;
+  /** Opened with the floating button. */
+  onOpen?: () => void;
   onClose?: () => void;
 };
 
-export function CustomBouquetPopup({ autoOpen = false, autoOpenDelayMs = 5000, onAutoOpen, onClose }: CustomBouquetPopupProps) {
+export function CustomBouquetPopup({ autoOpen = false, onAutoOpen, onOpen, onClose }: CustomBouquetPopupProps) {
   const { t } = useLanguage();
   const minDate = useMemo(() => toDateInputValue(earliestDeliveryDate()), []);
   const [open, setOpen] = useState(false);
@@ -38,12 +38,9 @@ export function CustomBouquetPopup({ autoOpen = false, autoOpenDelayMs = 5000, o
 
   useEffect(() => {
     if (!autoOpen) return;
-    const timer = setTimeout(() => {
-      setOpen(true);
-      onAutoOpen?.();
-    }, autoOpenDelayMs);
-    return () => clearTimeout(timer);
-  }, [autoOpen, autoOpenDelayMs, onAutoOpen]);
+    setOpen(true);
+    onAutoOpen?.();
+  }, [autoOpen, onAutoOpen]);
 
   const handleClose = () => {
     setOpen(false);
@@ -105,7 +102,10 @@ export function CustomBouquetPopup({ autoOpen = false, autoOpenDelayMs = 5000, o
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+          onOpen?.();
+        }}
         className="fixed bottom-6 right-6 z-40 flex items-center gap-2 bg-brand hover:bg-brand-hover text-white text-sm font-semibold pl-4 pr-5 py-3 rounded-full shadow-lg transition-colors"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
