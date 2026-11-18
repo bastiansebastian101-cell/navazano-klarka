@@ -56,6 +56,10 @@ export default function CheckoutPage() {
   }, []);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [notes, setNotes] = useState('');
+  const [isGift, setIsGift] = useState(false);
+  const [recipientName, setRecipientName] = useState('');
+  const [recipientPhone, setRecipientPhone] = useState('');
+  const [giftMessage, setGiftMessage] = useState('');
   const [occasionReason, setOccasionReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -154,6 +158,8 @@ export default function CheckoutPage() {
           paymentMethod,
           termsAccepted,
           notes,
+          isGift,
+          ...(isGift ? { recipientName, recipientPhone, giftMessage } : {}),
           occasionReason,
           couponCode: appliedCoupon?.code,
           items: items.map((i) => ({ productId: i.productId, variantId: i.variantId, quantity: i.quantity })),
@@ -272,6 +278,62 @@ export default function CheckoutPage() {
             className="w-full border border-ink-lighter/30 rounded-lg px-4 py-2.5"
           />
           <p className="mt-1.5 text-xs text-ink-lighter">{t.footer.deliveryArea}</p>
+        </div>
+
+        <div>
+          <label className="flex items-center gap-3 text-sm font-medium text-ink cursor-pointer">
+            <input
+              type="checkbox"
+              checked={isGift}
+              onChange={(e) => setIsGift(e.target.checked)}
+              className="h-4 w-4 accent-brand flex-shrink-0"
+            />
+            <span>{t.checkout.giftToggle}</span>
+          </label>
+          {isGift && (
+            <div className="mt-3 space-y-3 rounded-2xl bg-brand-light p-4">
+              <input
+                required
+                maxLength={100}
+                placeholder={t.checkout.giftRecipientName}
+                aria-label={t.checkout.giftRecipientName}
+                value={recipientName}
+                onChange={(e) => setRecipientName(e.target.value)}
+                className="w-full border border-ink-lighter/30 rounded-lg px-4 py-2.5 bg-white"
+              />
+              <div>
+                <input
+                  type="tel"
+                  maxLength={30}
+                  placeholder={t.checkout.giftRecipientPhone}
+                  aria-label={t.checkout.giftRecipientPhone}
+                  value={recipientPhone}
+                  onChange={(e) => setRecipientPhone(e.target.value)}
+                  className="w-full border border-ink-lighter/30 rounded-lg px-4 py-2.5 bg-white"
+                />
+                <p className="mt-1.5 text-xs text-ink-lighter">{t.checkout.giftRecipientPhoneHint}</p>
+              </div>
+              <div>
+                <label htmlFor="giftMessage" className="block text-sm font-medium text-ink mb-1.5">
+                  {t.checkout.giftMessage}
+                </label>
+                <textarea
+                  id="giftMessage"
+                  rows={3}
+                  maxLength={200}
+                  value={giftMessage}
+                  onChange={(e) => setGiftMessage(e.target.value)}
+                  className="w-full border border-ink-lighter/30 rounded-lg px-4 py-2.5 bg-white"
+                />
+                <div className="mt-1.5 flex justify-between gap-3 text-xs text-ink-lighter">
+                  <span>{t.checkout.giftMessageHint}</span>
+                  <span data-testid="gift-message-counter" className="flex-shrink-0 tabular-nums">
+                    {giftMessage.length}/200
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

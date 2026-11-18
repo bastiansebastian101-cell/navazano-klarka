@@ -108,7 +108,7 @@ export default function AdminOrdersPage() {
                 ))}
               </div>
 
-              {order.notes && <p className="mt-2 text-sm text-ink-light italic">&ldquo;{order.notes}&rdquo;</p>}
+              {order.notes && <p className="mt-2 text-sm text-ink-light italic whitespace-pre-line">&ldquo;{order.notes}&rdquo;</p>}
 
               <div className="mt-4 flex items-center gap-2 flex-wrap">
                 {STATUSES.map((status) => (

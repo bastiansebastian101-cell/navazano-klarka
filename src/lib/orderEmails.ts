@@ -33,6 +33,6 @@ export async function sendOrderEmails(orderId: string): Promise<void> {
   // One-click link to the customer's order history, only in the customer's email.
   const loginUrl = await createOrderLoginUrl(order.email);
 
-  await Promise.all([sendOrderConfirmationEmail({ ...emailData, loginUrl }), sendNewOrderAlertEmail(emailData)]);
+  await Promise.all([sendOrderConfirmationEmail({ ...emailData, loginUrl }), sendNewOrderAlertEmail({ ...emailData, notes: order.notes })]);
 }
 

@@ -15,9 +15,36 @@ interface OrderRequestBody {
   paymentMethod?: string;
   termsAccepted?: boolean;
   notes?: string;
+  isGift?: boolean;
+  recipientName?: string;
+  recipientPhone?: string;
+  giftMessage?: string;
   couponCode?: string;
   occasionReason?: string;
   items: { productId: string; variantId?: string | null; quantity: number }[];
+}
+
+const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
+
+// Gift details live in Order.notes (no DB schema change) as a clearly marked block.
+function buildNotes(body: OrderRequestBody): { notes: string | null } | { error: string } {
+  const note = str(body.notes);
+  if (body.isGift !== true) return { notes: note || null };
+
+  const name = str(body.recipientName);
+  const phone = str(body.recipientPhone);
+  const message = str(body.giftMessage);
+  if (!name) return { error: 'missing_fields' };
+  if (name.length > 100 || phone.length > 30 || message.length > 200) return { error: 'gift_too_long' };
+
+  const block = [
+    '🎁 DÁREK',
+    `Příjemce: ${name}`,
+    `Telefon příjemce: ${phone || '—'}`,
+    `Vzkaz na kartičku: ${message || '—'}`,
+    '---',
+  ].join('\n');
+  return { notes: note ? `${block}\n${note}` : block };
 }
 
 export async function POST(request: NextRequest) {
@@ -39,6 +66,11 @@ export async function POST(request: NextRequest) {
     // Consent to the terms of sale is required (checkbox at checkout).
     if (body.termsAccepted !== true) {
       return NextResponse.json({ error: 'terms_required' }, { status: 400 });
+    }
+
+    const notesResult = buildNotes(body);
+    if ('error' in notesResult) {
+      return NextResponse.json({ error: notesResult.error }, { status: 400 });
     }
 
     if (!isDeliveryWindowValid(body.deliveryWindow)) {
@@ -157,7 +189,7 @@ export async function POST(request: NextRequest) {
             deliveryDate,
             deliveryWindow: body.deliveryWindow,
             paymentMethod, // whitelisted above — never store raw client input
-            notes: body.notes?.trim() || null,
+            notes: notesResult.notes,
             totalCzk,
             discountCzk,
             customerId: customer.id,

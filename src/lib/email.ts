@@ -36,6 +36,8 @@ interface OrderEmailData {
   discountCzk?: number;
   totalCzk: number;
   items: { nameCs: string; variantLabel?: string | null; quantity: number; priceCzk: number }[];
+  /** Order notes incl. any gift block (shop alert email only). */
+  notes?: string | null;
   /** One-click login to order history (customer email only). */
   loginUrl?: string | null;
 }
@@ -138,6 +140,11 @@ export async function sendNewOrderAlertEmail(data: OrderEmailData): Promise<bool
           <tr><td style="padding:8px 0;color:#555;">Adresa</td><td style="padding:8px 0;color:#111;">${data.deliveryAddress}</td></tr>
           <tr><td style="padding:8px 0;color:#555;">Platba</td><td style="padding:8px 0;color:#111;">${paymentLabel}</td></tr>
         </table>
+        ${
+          data.notes
+            ? `<div style="margin-top:16px;padding:16px;background:#FBEEF1;border-radius:8px;"><p style="margin:0 0 6px;color:#555;font-size:13px;">Poznámka</p><p style="margin:0;color:#111;font-size:14px;white-space:pre-line;">${escapeHtml(data.notes).replace(/\n/g, '<br>')}</p></div>`
+            : ''
+        }
         <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:16px;border-top:1px solid #eee;padding-top:8px;">${itemsTable(data.items)}</table>
         <table style="width:100%;border-collapse:collapse;font-size:14px;">
           <tr><td style="padding:8px 0;font-weight:600;color:#111;">Celkem</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#B8567A;">${formatCzk(data.totalCzk)}</td></tr>
