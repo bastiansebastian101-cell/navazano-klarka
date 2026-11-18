@@ -32,21 +32,51 @@ function markPopupSeen() {
   }
 }
 
+// The subscription video only opens once the visitor has spent this long on the site.
+const VIDEO_DELAY_MS = 60_000;
+// When this visit started — kept for the browser tab, so page changes and reloads don't restart the minute.
+const VISIT_START_KEY = 'navazano_visit_start';
+
+function visitStart(): number {
+  try {
+    const saved = Number(sessionStorage.getItem(VISIT_START_KEY));
+    if (saved > 0) return saved;
+    const now = Date.now();
+    sessionStorage.setItem(VISIT_START_KEY, String(now));
+    return now;
+  } catch {
+    return Date.now();
+  }
+}
+
 type AutoPopup = 'video' | 'bouquet' | null;
 
 export function Popups() {
   const pathname = usePathname();
   const blocked = isNoPopupPath(pathname);
   const [autoPopup, setAutoPopup] = useState<AutoPopup>(null);
+  // True once the visitor has been on the site for VIDEO_DELAY_MS.
+  const [videoReady, setVideoReady] = useState(false);
+
+  useEffect(() => {
+    const remaining = visitStart() + VIDEO_DELAY_MS - Date.now();
+    if (remaining <= 0) {
+      setVideoReady(true);
+      return;
+    }
+    const timer = setTimeout(() => setVideoReady(true), remaining);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (blocked || autoPopup || hasSeenPopup()) return;
     const next: AutoPopup = pathname === '/kancelare' ? 'bouquet' : 'video';
+    if (next === 'video' && !videoReady) return;
     setAutoPopup(next);
-    // The video shows straight away, so it counts as seen now.
+    // The video counts as seen as soon as it opens.
     // The bouquet popup waits 5 s and is marked seen when it actually opens.
     if (next === 'video') markPopupSeen();
-  }, [blocked, pathname, autoPopup]);
+  }, [blocked, pathname, autoPopup, videoReady]);
 
   // Shown or closed: remember it and cancel any pending automatic popup.
   const finishAutoPopup = useCallback(() => {
