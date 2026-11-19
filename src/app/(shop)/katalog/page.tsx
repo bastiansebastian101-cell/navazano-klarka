@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default async function CatalogPage() {
   const products = await prisma.product.findMany({
     where: { active: true },
-    orderBy: { createdAt: 'desc' },
+    orderBy: [{ position: { sort: 'asc', nulls: 'first' } }, { createdAt: 'desc' }],
     include: { variants: { where: { active: true }, orderBy: { sortOrder: 'asc' } } },
   });
 

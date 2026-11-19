@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
   const products = await prisma.product.findMany({
     where: ids ? { id: { in: ids } } : undefined,
-    orderBy: { createdAt: 'desc' },
+    orderBy: [{ position: { sort: 'asc', nulls: 'first' } }, { createdAt: 'desc' }],
     include: { variants: { orderBy: { sortOrder: 'asc' } } },
   });
 

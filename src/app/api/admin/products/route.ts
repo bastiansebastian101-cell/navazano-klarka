@@ -25,7 +25,7 @@ function parseVariants(body: { variants?: unknown }): IncomingVariant[] {
 export async function GET(request: NextRequest) {
   if (!requireAdmin(request)) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const products = await prisma.product.findMany({
-    orderBy: { createdAt: 'desc' },
+    orderBy: [{ position: { sort: 'asc', nulls: 'first' } }, { createdAt: 'desc' }],
     include: { variants: { orderBy: { sortOrder: 'asc' } } },
   });
   return NextResponse.json({ products });

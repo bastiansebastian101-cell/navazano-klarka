@@ -22,7 +22,7 @@ export default async function HomePage() {
   const [featured, reviews] = await Promise.all([
     prisma.product.findMany({
       where: { active: true, featuredOnHome: true },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ position: { sort: 'asc', nulls: 'first' } }, { createdAt: 'desc' }],
       take: 12,
       include: { variants: { where: { active: true }, orderBy: { sortOrder: 'asc' } } },
     }),

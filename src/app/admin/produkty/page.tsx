@@ -54,6 +54,22 @@ export default function AdminProductsPage() {
     load();
   };
 
+  // Move a product to a new place (0-based) and save the whole order.
+  const moveTo = async (from: number, to: number) => {
+    if (to < 0 || to >= products.length || to === from) return;
+    const next = [...products];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    setProducts(next);
+    const res = await fetch('/api/admin/products/reorder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: next.map((p) => p.id) }),
+    });
+    if (res.ok) setNotice(t.admin.orderSaved);
+    else load();
+  };
+
   const toggleSelected = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -101,8 +117,48 @@ export default function AdminProductsPage() {
         <p className="text-ink-light">{t.admin.noProducts}</p>
       ) : (
         <div className="space-y-3">
-          {products.map((product) => (
+          {products.map((product, index) => (
             <div key={product.id} className="flex items-center gap-4 bg-white rounded-xl shadow-card p-4">
+              <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => moveTo(index, index - 1)}
+                  disabled={index === 0}
+                  title={t.admin.moveUp}
+                  aria-label={t.admin.moveUp}
+                  className="text-ink-light hover:text-brand disabled:opacity-20 leading-none"
+                >
+                  ▲
+                </button>
+                <input
+                  key={`${product.id}-${index}`}
+                  type="number"
+                  min={1}
+                  max={products.length}
+                  defaultValue={index + 1}
+                  title={t.admin.placeLabel}
+                  aria-label={t.admin.placeLabel}
+                  onBlur={(e) => {
+                    const place = parseInt(e.target.value, 10);
+                    if (Number.isInteger(place)) moveTo(index, Math.min(products.length, Math.max(1, place)) - 1);
+                    else e.target.value = String(index + 1);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                  }}
+                  className="w-12 text-center text-sm font-semibold border border-ink-lighter/30 rounded-md py-1"
+                />
+                <button
+                  type="button"
+                  onClick={() => moveTo(index, index + 1)}
+                  disabled={index === products.length - 1}
+                  title={t.admin.moveDown}
+                  aria-label={t.admin.moveDown}
+                  className="text-ink-light hover:text-brand disabled:opacity-20 leading-none"
+                >
+                  ▼
+                </button>
+              </div>
               <input
                 type="checkbox"
                 checked={selectedIds.has(product.id)}
